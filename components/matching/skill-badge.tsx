@@ -4,14 +4,22 @@ import { cn } from "@/lib/utils"
 
 interface SkillBadgeProps {
   skill: string
-  status?: "matched" | "missing" | "preferred"
+  status?: "normal" | "matched" | "missing" | "preferred"
   size?: "sm" | "md"
 }
 
-export function SkillBadge({ skill, status = "matched", size = "md" }: SkillBadgeProps) {
+export function SkillBadge({ skill, status = "normal", size = "md" }: SkillBadgeProps) {
   const sizeClasses = {
     sm: "text-xs px-2 py-0.5",
-    md: "text-sm px-2.5 py-1"
+    md: "text-sm px-2.5 py-1",
+  }
+
+  if (status === "normal") {
+    return (
+      <Badge variant="secondary" className={cn(sizeClasses[size])}>
+        {skill}
+      </Badge>
+    )
   }
 
   const statusConfig = {

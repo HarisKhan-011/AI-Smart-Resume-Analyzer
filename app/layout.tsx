@@ -1,21 +1,28 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
-  title: "AI-Powered Smart Resume Analyzer & Job Matcher",
-  description: "Analyze resumes, match with jobs, and get AI-powered recommendations",
-};
+  title: "ResumeAI — Smart Resume Analyzer & Job Matcher",
+  description:
+    "AI-powered resume analysis, job matching, skill gap analysis and job recommendations.",
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className={inter.variable}>
+      <body className="min-h-screen bg-background font-sans antialiased">
         {children}
       </body>
     </html>
-  );
+  )
 }

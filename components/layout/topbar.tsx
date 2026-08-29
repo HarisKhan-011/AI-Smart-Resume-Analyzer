@@ -1,38 +1,80 @@
 "use client"
 
-import { Bell, Search, User } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Bell, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { UserMenu } from "./user-menu"
+import { MobileMenuButton } from "./mobile-navigation"
 
-export function Topbar() {
+const pageTitles: Record<string, string> = {
+  "/dashboard": "Dashboard",
+  "/resume/upload": "My Resumes",
+  "/resume/analysis": "Resume Analysis",
+  "/job-match": "Check Job Match",
+  "/recommendations": "Recommended Jobs",
+  "/skill-gap": "Skill Gap",
+  "/applications": "Applications",
+  "/profile": "Profile",
+  "/jobs": "Jobs",
+  "/recruiter": "Recruiter Dashboard",
+  "/recruiter/jobs": "My Jobs",
+  "/recruiter/candidates": "Candidates",
+  "/recruiter/rankings": "Candidate Rankings",
+  "/settings": "Settings",
+}
+
+function getPageTitle(pathname: string): string {
+  if (pageTitles[pathname]) return pageTitles[pathname]
+  if (pathname.startsWith("/jobs/")) return "Job Details"
+  return "Dashboard"
+}
+
+interface TopbarProps {
+  title?: string
+  role?: "candidate" | "recruiter"
+  onMenuClick?: () => void
+  showSearch?: boolean
+}
+
+export function Topbar({
+  title,
+  role = "candidate",
+  onMenuClick,
+  showSearch = true,
+}: TopbarProps) {
+  const pathname = usePathname()
+  const displayTitle = title ?? getPageTitle(pathname)
+
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-6">
-      <div className="flex items-center space-x-4">
-        <div className="relative w-96">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="pl-10"
-          />
-        </div>
+    <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        {onMenuClick && <MobileMenuButton onClick={onMenuClick} />}
+        <h1 className="truncate text-lg font-semibold sm:text-xl">{displayTitle}</h1>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" className="relative">
+      <div className="flex items-center gap-2 sm:gap-4">
+        {showSearch && (
+          <div className="relative hidden md:block">
+            <Search
+              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="w-48 pl-10 lg:w-64"
+              aria-label="Search"
+            />
+          </div>
+        )}
+
+        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
           <Bell className="h-5 w-5" />
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
+          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" aria-hidden="true" />
         </Button>
-        
-        <div className="flex items-center space-x-2 border-l pl-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
-            <User className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <div className="text-sm">
-            <p className="font-medium">John Doe</p>
-            <p className="text-xs text-muted-foreground">Candidate</p>
-          </div>
-        </div>
+
+        <UserMenu role={role} />
       </div>
     </header>
   )
