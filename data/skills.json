@@ -1,0 +1,66 @@
+{
+  "programming": [
+    "JavaScript",
+    "TypeScript",
+    "Python",
+    "Java",
+    "C++",
+    "C#",
+    "Go",
+    "Rust",
+    "PHP",
+    "Ruby"
+  ],
+  "frameworks": [
+    "React",
+    "Next.js",
+    "Vue.js",
+    "Angular",
+    "Node.js",
+    "Express.js",
+    "Django",
+    "Flask",
+    "Spring Boot",
+    "ASP.NET"
+  ],
+  "databases": [
+    "MongoDB",
+    "PostgreSQL",
+    "MySQL",
+    "Redis",
+    "SQLite",
+    "Oracle",
+    "Microsoft SQL Server",
+    "Elasticsearch"
+  ],
+  "cloud": [
+    "AWS",
+    "Google Cloud",
+    "Azure",
+    "Docker",
+    "Kubernetes",
+    "Terraform",
+    "Serverless",
+    "Lambda"
+  ],
+  "tools": [
+    "Git",
+    "GitHub",
+    "GitLab",
+    "Jira",
+    "Confluence",
+    "CI/CD",
+    "Jenkins",
+    "Webpack",
+    "Vite"
+  ],
+  "soft_skills": [
+    "Communication",
+    "Teamwork",
+    "Problem Solving",
+    "Leadership",
+    "Time Management",
+    "Adaptability",
+    "Critical Thinking"
+  ]
+}
