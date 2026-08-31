@@ -3,11 +3,12 @@
 import { Menu, X } from "lucide-react"
 import { Sidebar } from "./sidebar"
 import { cn } from "@/lib/utils"
+import type { UserRole } from "@/types/user"
 
 interface MobileNavigationProps {
   open: boolean
   onClose: () => void
-  role?: "candidate" | "recruiter"
+  role?: UserRole
 }
 
 export function MobileNavigation({ open, onClose, role = "candidate" }: MobileNavigationProps) {

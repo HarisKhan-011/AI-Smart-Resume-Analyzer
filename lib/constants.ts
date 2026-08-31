@@ -1,8 +1,9 @@
 export const APP_NAME = 'AI-Powered Smart Resume Analyzer & Job Matcher';
 
 export const USER_ROLES = {
-  CANDIDATE: 'candidate',
-  RECRUITER: 'recruiter',
+  CANDIDATE: "candidate",
+  RECRUITER: "recruiter",
+  ADMIN: "admin",
 } as const;
 
 export const RECOMMENDATION_TYPES = {

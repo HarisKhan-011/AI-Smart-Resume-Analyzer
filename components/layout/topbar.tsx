@@ -22,6 +22,7 @@ const pageTitles: Record<string, string> = {
   "/recruiter/candidates": "Candidates",
   "/recruiter/rankings": "Candidate Rankings",
   "/settings": "Settings",
+  "/admin": "Admin Dashboard",
 }
 
 function getPageTitle(pathname: string): string {
@@ -32,17 +33,11 @@ function getPageTitle(pathname: string): string {
 
 interface TopbarProps {
   title?: string
-  role?: "candidate" | "recruiter"
   onMenuClick?: () => void
   showSearch?: boolean
 }
 
-export function Topbar({
-  title,
-  role = "candidate",
-  onMenuClick,
-  showSearch = true,
-}: TopbarProps) {
+export function Topbar({ title, onMenuClick, showSearch = true }: TopbarProps) {
   const pathname = usePathname()
   const displayTitle = title ?? getPageTitle(pathname)
 
@@ -71,10 +66,9 @@ export function Topbar({
 
         <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
           <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" aria-hidden="true" />
         </Button>
 
-        <UserMenu role={role} />
+        <UserMenu />
       </div>
     </header>
   )

@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { auth } from "@/auth"
+import { SessionProvider } from "@/components/providers/session-provider"
 import "./globals.css"
 
 const inter = Inter({
@@ -13,15 +15,17 @@ export const metadata: Metadata = {
     "AI-powered resume analysis, job matching, skill gap analysis and job recommendations.",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const session = await auth()
+
   return (
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-background font-sans antialiased">
-        {children}
+        <SessionProvider session={session}>{children}</SessionProvider>
       </body>
     </html>
   )

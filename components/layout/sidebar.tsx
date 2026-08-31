@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { LogoutButton } from "@/components/auth/logout-button"
+import type { UserRole } from "@/types/user"
 import {
   LayoutDashboard,
   FileText,
@@ -12,9 +14,9 @@ import {
   ClipboardList,
   User,
   Settings,
-  LogOut,
   Users,
   BarChart3,
+  Shield,
   LucideIcon,
 } from "lucide-react"
 
@@ -42,6 +44,27 @@ export const recruiterNavItems: NavItem[] = [
   { href: "/profile", label: "Profile", icon: User },
 ]
 
+export const adminNavItems: NavItem[] = [
+  { href: "/admin", label: "Dashboard", icon: Shield },
+  { href: "/recruiter", label: "Recruiter Tools", icon: Briefcase },
+  { href: "/dashboard", label: "Candidate View", icon: LayoutDashboard },
+  { href: "/profile", label: "Profile", icon: User },
+]
+
+export function getNavItems(role: UserRole = "candidate"): NavItem[] {
+  if (role === "admin") return adminNavItems
+  if (role === "recruiter") return recruiterNavItems
+  return candidateNavItems
+}
+
+const exactMatchHrefs = new Set([
+  "/dashboard",
+  "/recruiter",
+  "/admin",
+  "/profile",
+  "/settings",
+])
+
 interface NavLinksProps {
   items: NavItem[]
   onNavigate?: () => void
@@ -55,15 +78,13 @@ export function NavLinks({ items, onNavigate, collapsed = false }: NavLinksProps
     <nav className="flex-1 space-y-1 p-4" aria-label="Main navigation">
       {items.map((item) => {
         const Icon = item.icon
-        const isActive =
-          pathname === item.href ||
-          (item.href !== "/dashboard" &&
-            item.href !== "/recruiter" &&
-            pathname.startsWith(item.href))
+        const isActive = exactMatchHrefs.has(item.href)
+          ? pathname === item.href
+          : pathname === item.href || pathname.startsWith(`${item.href}/`)
 
         return (
           <Link
-            key={item.href}
+            key={`${item.href}-${item.label}`}
             href={item.href}
             onClick={onNavigate}
             className={cn(
@@ -105,30 +126,25 @@ export function SidebarFooter({ onNavigate, collapsed = false }: SidebarFooterPr
         <Settings className="h-5 w-5 shrink-0" aria-hidden="true" />
         {!collapsed && <span>Settings</span>}
       </Link>
-      <Link
-        href="/login"
-        onClick={onNavigate}
-        className={cn(
-          "mt-1 flex items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          collapsed ? "justify-center" : "space-x-3"
-        )}
-        title={collapsed ? "Logout" : undefined}
-      >
-        <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
-        {!collapsed && <span>Logout</span>}
-      </Link>
+      <LogoutButton collapsed={collapsed} onClick={onNavigate} className="mt-1" />
     </div>
   )
 }
 
 interface SidebarProps {
-  role?: "candidate" | "recruiter"
+  role?: UserRole
   collapsed?: boolean
   onNavigate?: () => void
 }
 
 export function Sidebar({ role = "candidate", collapsed = false, onNavigate }: SidebarProps) {
-  const navItems = role === "candidate" ? candidateNavItems : recruiterNavItems
+  const navItems = getNavItems(role)
+  const label =
+    role === "admin"
+      ? "Admin navigation"
+      : role === "recruiter"
+        ? "Recruiter navigation"
+        : "Candidate navigation"
 
   return (
     <aside
@@ -136,10 +152,13 @@ export function Sidebar({ role = "candidate", collapsed = false, onNavigate }: S
         "flex h-full flex-col border-r bg-background transition-all duration-200",
         collapsed ? "w-16" : "w-64"
       )}
-      aria-label={role === "candidate" ? "Candidate navigation" : "Recruiter navigation"}
+      aria-label={label}
     >
       <div className={cn("flex h-16 items-center border-b", collapsed ? "justify-center px-2" : "px-6")}>
-        <Link href="/" className="flex items-center space-x-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md">
+        <Link
+          href="/"
+          className="flex items-center space-x-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <span className="text-sm font-bold text-primary-foreground">R</span>
           </div>

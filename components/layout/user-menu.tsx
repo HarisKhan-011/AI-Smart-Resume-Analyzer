@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { signOut, useSession } from "next-auth/react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,14 +11,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar } from "@/components/ui/avatar"
+import { getRoleLabel } from "@/lib/auth-paths"
+import { getInitials } from "@/lib/utils"
 import { User, Settings, LogOut } from "lucide-react"
 
-interface UserMenuProps {
-  role?: "candidate" | "recruiter"
-}
-
-export function UserMenu({ role = "candidate" }: UserMenuProps) {
-  const roleLabel = role === "candidate" ? "Candidate" : "Recruiter"
+export function UserMenu() {
+  const { data: session } = useSession()
+  const name = session?.user?.name ?? "Account"
+  const roleLabel = getRoleLabel(session?.user?.role)
+  const initials = getInitials(session?.user?.name)
 
   return (
     <DropdownMenu>
@@ -26,9 +28,14 @@ export function UserMenu({ role = "candidate" }: UserMenuProps) {
           className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="User menu"
         >
-          <Avatar fallback="U" className="h-8 w-8" />
+          <Avatar
+            src={session?.user?.image ?? undefined}
+            alt={name}
+            fallback={initials}
+            className="h-8 w-8"
+          />
           <div className="hidden text-left text-sm sm:block">
-            <p className="font-medium leading-none">Demo User</p>
+            <p className="max-w-[10rem] truncate font-medium leading-none">{name}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">{roleLabel}</p>
           </div>
         </button>
@@ -49,11 +56,14 @@ export function UserMenu({ role = "candidate" }: UserMenuProps) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/login" className="cursor-pointer">
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Link>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={() => {
+            void signOut({ callbackUrl: "/login" })
+          }}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

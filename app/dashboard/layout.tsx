@@ -1,9 +1,9 @@
-import { DashboardLayout } from "@/components/layout/dashboard-layout"
+import { ProtectedLayout } from "@/components/layout/protected-layout"
 
 export default function DashboardLayoutWrapper({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <DashboardLayout role="candidate">{children}</DashboardLayout>
+  return <ProtectedLayout>{children}</ProtectedLayout>
 }
