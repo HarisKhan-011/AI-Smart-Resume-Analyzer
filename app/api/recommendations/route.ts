@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server';
+import { getApiUser } from "@/lib/auth-utils"
+import { handleGetRecommendationsRequest } from "@/services/recommendations/recommendation-http"
 
-export async function GET() {
-  return NextResponse.json({ message: 'Recommendations API - GET' });
-}
+export const runtime = "nodejs"
 
-export async function POST() {
-  return NextResponse.json({ message: 'Recommendations API - POST' });
+export async function GET(request: Request) {
+  const user = await getApiUser()
+  const { searchParams } = new URL(request.url)
+  return handleGetRecommendationsRequest(user, searchParams.get("resumeId") ?? "")
 }

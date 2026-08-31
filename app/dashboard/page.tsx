@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { requireAuth } from "@/lib/auth-utils"
 import { listResumesByUser } from "@/services/resume-service"
+import { recommendJobsForUser } from "@/services/recommendations/recommendation-service"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { PageHeader } from "@/components/shared/page-header"
@@ -10,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { JobCard } from "@/components/jobs/job-card"
 import {
   FileText,
   Briefcase,
@@ -19,12 +21,24 @@ import {
   Upload,
   Eye,
   Search,
+  Lightbulb,
 } from "lucide-react"
 
 export default async function DashboardPage() {
   const user = await requireAuth()
   const resumes = await listResumesByUser(user.id)
   const recentResumes = resumes.slice(0, 5)
+  const analyzedResume = resumes.find((resume) => resume.skills.length > 0)
+
+  let recommendedJobs: Awaited<ReturnType<typeof recommendJobsForUser>>["recommendations"] = []
+  if (analyzedResume) {
+    try {
+      const result = await recommendJobsForUser(user.id, analyzedResume.id)
+      recommendedJobs = result.recommendations
+    } catch {
+      recommendedJobs = []
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -42,7 +56,12 @@ export default async function DashboardPage() {
           description={resumes.length ? "Uploaded" : "No resume uploaded yet"}
         />
         <StatCard title="Resume Score" value="--%" icon={Sparkles} description="No analysis yet" />
-        <StatCard title="Jobs Matched" value="--" icon={Briefcase} description="Upload resume first" />
+        <StatCard
+          title="Jobs Matched"
+          value={recommendedJobs.length ? recommendedJobs.length : "--"}
+          icon={Briefcase}
+          description={recommendedJobs.length ? "Suitable jobs ranked" : "Analyze a resume first"}
+        />
         <StatCard title="Applications" value="--" icon={ClipboardList} description="Not tracked yet" />
       </div>
 
@@ -75,6 +94,47 @@ export default async function DashboardPage() {
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">Recommended for You</CardTitle>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/recommendations">
+              <Lightbulb className="mr-1 h-4 w-4" />
+              View all
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {recommendedJobs.length === 0 ? (
+            <EmptyState
+              icon={Lightbulb}
+              title="No recommendations yet"
+              description="Analyze a resume and search jobs so we can rank the best matches for you."
+              actionText="View recommendations"
+              actionHref="/recommendations"
+            />
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {recommendedJobs.slice(0, 3).map((item) => (
+                <JobCard
+                  key={item.jobId}
+                  id={item.job.id}
+                  title={item.job.title}
+                  company={item.job.company}
+                  location={item.job.location}
+                  employmentType={item.job.employmentType}
+                  matchScore={item.overallScore}
+                  skills={item.matchedSkills}
+                  missingSkills={item.missingSkills}
+                  href={`/jobs/${item.job.id}`}
+                  checkMatchHref={`/job-match?jobId=${item.job.id}`}
+                />
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 

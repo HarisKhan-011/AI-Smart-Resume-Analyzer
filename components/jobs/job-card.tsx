@@ -18,8 +18,10 @@ export interface JobCardProps {
   skills?: string[]
   postedAt?: Date | string
   href?: string
+  checkMatchHref?: string
   onSave?: () => void
   requiredSkillCount?: number
+  missingSkills?: string[]
 }
 
 export function JobCard({
@@ -33,8 +35,10 @@ export function JobCard({
   skills = [],
   postedAt,
   href = "#",
+  checkMatchHref,
   onSave,
   requiredSkillCount,
+  missingSkills = [],
 }: JobCardProps) {
   return (
     <Card className="flex flex-col transition-shadow hover:shadow-md">
@@ -75,17 +79,39 @@ export function JobCard({
           )}
         </div>
         {skills.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {skills.slice(0, 4).map((skill) => (
-              <Badge key={skill} variant="secondary" className="text-xs">
-                {skill}
-              </Badge>
-            ))}
-            {skills.length > 4 && (
-              <Badge variant="outline" className="text-xs">
-                +{skills.length - 4}
-              </Badge>
+          <div className="space-y-1.5">
+            {missingSkills.length > 0 && (
+              <p className="text-xs font-medium text-muted-foreground">Matched skills</p>
             )}
+            <div className="flex flex-wrap gap-1.5">
+              {skills.slice(0, 4).map((skill) => (
+                <Badge key={skill} variant="secondary" className="text-xs">
+                  {skill}
+                </Badge>
+              ))}
+              {skills.length > 4 && (
+                <Badge variant="outline" className="text-xs">
+                  +{skills.length - 4}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+        {missingSkills.length > 0 && (
+          <div className="space-y-1.5">
+            <p className="text-xs font-medium text-muted-foreground">Missing skills</p>
+            <div className="flex flex-wrap gap-1.5">
+              {missingSkills.slice(0, 4).map((skill) => (
+                <Badge key={skill} variant="outline" className="text-xs">
+                  {skill}
+                </Badge>
+              ))}
+              {missingSkills.length > 4 && (
+                <Badge variant="outline" className="text-xs">
+                  +{missingSkills.length - 4}
+                </Badge>
+              )}
+            </div>
           </div>
         )}
         {typeof requiredSkillCount === "number" && (
@@ -103,6 +129,11 @@ export function JobCard({
         <Button asChild className="flex-1" size="sm">
           <Link href={href}>View Job</Link>
         </Button>
+        {checkMatchHref && (
+          <Button asChild variant="outline" className="flex-1" size="sm">
+            <Link href={checkMatchHref}>Check Match</Link>
+          </Button>
+        )}
         {onSave && (
           <Button
             variant="outline"

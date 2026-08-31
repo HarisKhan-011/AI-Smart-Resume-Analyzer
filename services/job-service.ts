@@ -94,6 +94,20 @@ export async function listAccessibleJobs(userId: string): Promise<JobDTO[]> {
   return jobs.map(toJobDTO)
 }
 
+export async function listJobsForRecommendations(
+  userId: string,
+  limit = 120
+): Promise<JobDTO[]> {
+  await dbConnect()
+  const jobs = await Job.find({
+    $or: [{ createdBy: userId }, { source: "api" }],
+    requiredSkills: { $exists: true, $ne: [] },
+  })
+    .sort({ postedDate: -1, createdAt: -1 })
+    .limit(limit)
+  return jobs.map(toJobDTO)
+}
+
 export async function listPublicJobs(options?: {
   limit?: number
   employmentType?: string

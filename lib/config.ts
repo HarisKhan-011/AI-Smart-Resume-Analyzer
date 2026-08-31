@@ -29,6 +29,20 @@ export const config = {
       education: 0.1,
     },
   },
+
+  recommendations: {
+    limit: 10,
+    minRequiredCoverage: 25,
+    minMatchedRequiredSkills: 1,
+    minOverallScore: 40,
+    jobPoolLimit: 120,
+    weight: {
+      requiredSkills: 0.6,
+      preferredSkills: 0.15,
+      experience: 0.15,
+      relevance: 0.1,
+    },
+  },
   
   // Pagination configuration
   pagination: {
