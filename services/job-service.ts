@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose"
 import { dbConnect } from "@/lib/mongodb"
 import { toStringId } from "@/lib/serialize"
 import { Job, type JobDocument } from "@/models/job"
@@ -57,9 +58,47 @@ export async function createJob(input: CreateJobInput): Promise<JobDTO> {
 }
 
 export async function getJobById(id: string): Promise<JobDTO | null> {
+  if (!isValidObjectId(id)) return null
   await dbConnect()
   const job = await Job.findById(id)
   return job ? toJobDTO(job) : null
+}
+
+export async function getOwnedJob(id: string, userId: string): Promise<JobDTO | null> {
+  if (!isValidObjectId(id)) return null
+  await dbConnect()
+  const job = await Job.findOne({ _id: id, createdBy: userId })
+  return job ? toJobDTO(job) : null
+}
+
+export async function listJobsByUser(userId: string): Promise<JobDTO[]> {
+  await dbConnect()
+  const jobs = await Job.find({ createdBy: userId }).sort({ createdAt: -1 }).limit(50)
+  return jobs.map(toJobDTO)
+}
+
+export function normalizeJobDescription(description: string): string {
+  return description.toLowerCase().replace(/\s+/g, " ").trim()
+}
+
+export async function findDuplicateJob(input: {
+  userId: string
+  title: string
+  company: string
+  description: string
+}): Promise<JobDTO | null> {
+  await dbConnect()
+  const candidates = await Job.find({
+    createdBy: input.userId,
+    title: input.title.trim(),
+    company: input.company.trim(),
+  }).limit(20)
+
+  const needle = normalizeJobDescription(input.description)
+  const match = candidates.find(
+    (job) => normalizeJobDescription(job.description) === needle
+  )
+  return match ? toJobDTO(match) : null
 }
 
 export async function listJobs(options?: {
@@ -75,6 +114,7 @@ export async function listJobs(options?: {
 }
 
 export async function updateJob(id: string, input: UpdateJobInput): Promise<JobDTO | null> {
+  if (!isValidObjectId(id)) return null
   await dbConnect()
   const job = await Job.findByIdAndUpdate(id, input, { new: true })
   return job ? toJobDTO(job) : null

@@ -1,62 +1,57 @@
-import { FeaturePlaceholder } from "@/components/shared/feature-placeholder"
-import { Briefcase } from "lucide-react"
-import { EmptyState } from "@/components/dashboard/empty-state"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
+import { requireAuth } from "@/lib/auth-utils"
+import { listJobsByUser } from "@/services/job-service"
 import { JobCard } from "@/components/jobs/job-card"
-import { mockDemoJobs } from "@/lib/mock-data"
+import { EmptyState } from "@/components/dashboard/empty-state"
+import { PageHeader } from "@/components/shared/page-header"
+import { Button } from "@/components/ui/button"
+import { Briefcase, Search } from "lucide-react"
 
-export default function JobsPage() {
+export default async function JobsPage() {
+  const user = await requireAuth()
+  const jobs = await listJobsByUser(user.id)
+
   return (
     <div className="space-y-6">
-      <FeaturePlaceholder
-        title="Jobs"
-        description="Browse available job listings. Job data will be connected in a future phase."
-        icon={Briefcase}
-        actionLabel="Check Job Match"
-        actionHref="/job-match"
-      />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <PageHeader
+          title="Jobs"
+          description="Job descriptions you have analyzed."
+          icon={Briefcase}
+        />
+        <Button asChild className="sm:mt-1">
+          <Link href="/job-match">
+            <Search className="h-4 w-4" />
+            Analyze Job
+          </Link>
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Demo Job Cards (UI Preview)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4 text-sm text-muted-foreground">
-            The cards below use clearly labeled demo data for UI development only.
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {mockDemoJobs.map((job) => (
-              <JobCard
-                key={job.id}
-                id={job.id}
-                title={job.title}
-                company={job.company}
-                location={job.location}
-                skills={job.requiredSkills}
-                postedAt={job.postedDate}
-                employmentType="Full-time"
-                matchScore={null}
-                href={`/jobs/${job.id}`}
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Saved Jobs</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <EmptyState
-            icon={Briefcase}
-            title="No saved jobs"
-            description="Save jobs you're interested in to review them later."
-            actionText="Explore Jobs"
-            actionHref="/jobs"
-          />
-        </CardContent>
-      </Card>
+      {jobs.length === 0 ? (
+        <EmptyState
+          icon={Briefcase}
+          title="No jobs analyzed yet."
+          description="Paste a job description to extract required and preferred skills."
+          actionText="Analyze Job"
+          actionHref="/job-match"
+        />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {jobs.map((job) => (
+            <JobCard
+              key={job.id}
+              id={job.id}
+              title={job.title}
+              company={job.company}
+              location={job.location}
+              skills={job.requiredSkills}
+              postedAt={job.createdAt}
+              href={`/jobs/${job.id}`}
+              requiredSkillCount={job.requiredSkills.length}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,9 +1,7 @@
-import { NextResponse } from 'next/server';
+import { getApiUser } from "@/lib/auth-utils"
+import { handleListJobsRequest } from "@/services/job-http"
 
 export async function GET() {
-  return NextResponse.json({ message: 'Jobs API - GET' });
-}
-
-export async function POST() {
-  return NextResponse.json({ message: 'Jobs API - POST' });
+  const user = await getApiUser()
+  return handleListJobsRequest(user)
 }

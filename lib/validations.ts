@@ -106,3 +106,35 @@ export const registerSchema = z
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>
+
+export const MIN_JOB_DESCRIPTION_LENGTH = 50
+
+export const jobAnalyzeSchema = z.object({
+  title: z
+    .string({ required_error: "Job title is required" })
+    .trim()
+    .min(2, "Job title must be at least 2 characters")
+    .max(120, "Job title must be 120 characters or less"),
+  company: z
+    .string({ required_error: "Company is required" })
+    .trim()
+    .min(2, "Company must be at least 2 characters")
+    .max(120, "Company must be 120 characters or less"),
+  location: z
+    .string()
+    .trim()
+    .max(120, "Location must be 120 characters or less")
+    .optional()
+    .default(""),
+  description: z
+    .string({ required_error: "Job description is required" })
+    .trim()
+    .min(1, "Job description cannot be empty")
+    .min(
+      MIN_JOB_DESCRIPTION_LENGTH,
+      "Job description is too short. Paste a fuller description so skills can be detected."
+    )
+    .max(20000, "Job description is too long"),
+})
+
+export type JobAnalyzeInput = z.infer<typeof jobAnalyzeSchema>

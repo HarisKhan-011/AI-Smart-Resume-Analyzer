@@ -16,6 +16,7 @@ export interface JobCardProps {
   postedAt?: Date
   href?: string
   onSave?: () => void
+  requiredSkillCount?: number
 }
 
 export function JobCard({
@@ -28,6 +29,7 @@ export function JobCard({
   postedAt,
   href = "#",
   onSave,
+  requiredSkillCount,
 }: JobCardProps) {
   return (
     <Card className="flex flex-col transition-shadow hover:shadow-md">
@@ -76,6 +78,11 @@ export function JobCard({
             )}
           </div>
         )}
+        {typeof requiredSkillCount === "number" && (
+          <p className="text-sm text-muted-foreground">
+            {requiredSkillCount} required skill{requiredSkillCount === 1 ? "" : "s"}
+          </p>
+        )}
         {postedAt && (
           <p className="text-xs text-muted-foreground">
             Posted {formatDate(postedAt)}
@@ -84,16 +91,18 @@ export function JobCard({
       </CardContent>
       <CardFooter className="gap-2 pt-0">
         <Button asChild className="flex-1" size="sm">
-          <Link href={href}>View Job</Link>
+          <Link href={href}>View</Link>
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          aria-label="Save job"
-          onClick={onSave}
-        >
-          <Bookmark className="h-4 w-4" />
-        </Button>
+        {onSave && (
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Save job"
+            onClick={onSave}
+          >
+            <Bookmark className="h-4 w-4" />
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )
