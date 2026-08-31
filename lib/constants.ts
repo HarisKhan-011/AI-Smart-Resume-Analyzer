@@ -51,4 +51,9 @@ export const APPLICATION_STATUS = {
   OFFERED: 'offered',
 } as const;
 
+export const RESUME_FILE_TYPES = {
+  PDF: 'pdf',
+  DOCX: 'docx',
+} as const;
+
 export const MATCH_THRESHOLD = 60; // Minimum match score to consider a job relevant

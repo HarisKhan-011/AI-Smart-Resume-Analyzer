@@ -13,12 +13,20 @@ export function getInitials(name?: string | null): string {
   return `${first}${last}`.toUpperCase() || "U"
 }
 
-export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date);
+export function formatDate(date: Date | string): string {
+  const value = date instanceof Date ? date : new Date(date)
+  if (Number.isNaN(value.getTime())) return "Unknown date"
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(value)
+}
+
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 export function calculateMatchScore(

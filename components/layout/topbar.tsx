@@ -9,7 +9,8 @@ import { MobileMenuButton } from "./mobile-navigation"
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
-  "/resume/upload": "My Resumes",
+  "/resume": "My Resumes",
+  "/resume/upload": "Upload Resume",
   "/resume/analysis": "Resume Analysis",
   "/job-match": "Check Job Match",
   "/recommendations": "Recommended Jobs",
@@ -27,6 +28,7 @@ const pageTitles: Record<string, string> = {
 
 function getPageTitle(pathname: string): string {
   if (pageTitles[pathname]) return pageTitles[pathname]
+  if (pathname.startsWith("/resume/")) return "Resume"
   if (pathname.startsWith("/jobs/")) return "Job Details"
   return "Dashboard"
 }

@@ -1,31 +1,25 @@
-import { FeaturePlaceholder } from "@/components/shared/feature-placeholder"
+import { PageHeader } from "@/components/shared/page-header"
+import { ResumeUploadForm } from "@/components/resume/resume-upload-form"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Upload } from "lucide-react"
-import { EmptyState } from "@/components/dashboard/empty-state"
-import { FileText } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function ResumeUploadPage() {
   return (
     <div className="space-y-6">
-      <FeaturePlaceholder
-        title="My Resumes"
-        description="Upload and manage your resumes for AI analysis."
+      <PageHeader
+        title="Upload Resume"
+        description="Upload a PDF or DOCX resume. We will extract the text now; AI analysis comes in a later phase."
         icon={Upload}
-        actionLabel="Go to Dashboard"
-        actionHref="/dashboard"
       />
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Your Resumes</CardTitle>
+          <CardTitle className="text-lg">Resume file</CardTitle>
+          <CardDescription>
+            Supported formats: PDF and DOCX. Maximum size: 5MB.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <EmptyState
-            icon={FileText}
-            title="No resumes uploaded"
-            description="Upload your resume to start your AI analysis."
-            actionText="Upload Resume"
-            actionHref="/resume/upload"
-          />
+          <ResumeUploadForm />
         </CardContent>
       </Card>
     </div>

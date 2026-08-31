@@ -61,6 +61,7 @@ const ResumeSchema = new Schema<ResumeDocument>(
     extractedText: {
       type: String,
       default: "",
+      select: false,
     },
     skills: {
       type: [String],

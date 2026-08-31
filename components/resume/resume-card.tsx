@@ -3,33 +3,38 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { formatDate } from "@/lib/utils"
+import type { AnalysisStatus } from "@/types/resume"
 import { FileText, Eye, Sparkles } from "lucide-react"
 
 export interface ResumeCardProps {
   id: string
   fileName: string
+  fileType?: string
   uploadedAt?: Date
-  score?: number | null
-  status?: "pending" | "analyzed" | "failed"
+  analysisStatus?: AnalysisStatus
   viewHref?: string
   analyzeHref?: string
 }
 
-const statusConfig = {
-  pending: { label: "Pending", variant: "secondary" as const },
-  analyzed: { label: "Analyzed", variant: "success" as const },
-  failed: { label: "Failed", variant: "destructive" as const },
+const statusConfig: Record<
+  AnalysisStatus,
+  { label: string; variant: "secondary" | "warning" | "success" | "destructive" }
+> = {
+  pending: { label: "Pending analysis", variant: "secondary" },
+  processing: { label: "Processing", variant: "warning" },
+  completed: { label: "Analyzed", variant: "success" },
+  failed: { label: "Failed", variant: "destructive" },
 }
 
 export function ResumeCard({
   fileName,
+  fileType,
   uploadedAt,
-  score,
-  status = "pending",
+  analysisStatus = "pending",
   viewHref = "#",
   analyzeHref = "#",
 }: ResumeCardProps) {
-  const statusInfo = statusConfig[status]
+  const statusInfo = statusConfig[analysisStatus]
 
   return (
     <Card className="transition-shadow hover:shadow-md">
@@ -41,6 +46,11 @@ export function ResumeCard({
           <div className="min-w-0">
             <h3 className="truncate font-medium">{fileName}</h3>
             <div className="mt-1 flex flex-wrap items-center gap-2">
+              {fileType && (
+                <Badge variant="outline" className="text-xs uppercase">
+                  {fileType}
+                </Badge>
+              )}
               {uploadedAt && (
                 <span className="text-xs text-muted-foreground">
                   Uploaded {formatDate(uploadedAt)}
@@ -52,27 +62,19 @@ export function ResumeCard({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3 sm:shrink-0">
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">Score</p>
-            <p className="text-lg font-bold">
-              {score != null ? `${score}%` : "--"}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href={viewHref}>
-                <Eye className="mr-1 h-4 w-4" />
-                View
-              </Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href={analyzeHref}>
-                <Sparkles className="mr-1 h-4 w-4" />
-                Analyze
-              </Link>
-            </Button>
-          </div>
+        <div className="flex gap-2 sm:shrink-0">
+          <Button asChild variant="outline" size="sm">
+            <Link href={viewHref}>
+              <Eye className="mr-1 h-4 w-4" />
+              View
+            </Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href={analyzeHref}>
+              <Sparkles className="mr-1 h-4 w-4" />
+              Analyze
+            </Link>
+          </Button>
         </div>
       </CardContent>
     </Card>

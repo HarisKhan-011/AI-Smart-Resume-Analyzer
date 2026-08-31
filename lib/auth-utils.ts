@@ -38,4 +38,8 @@ export async function requireRole(
   return user
 }
 
+export async function getApiUser(): Promise<SessionUser | null> {
+  return getSessionUser()
+}
+
 export { getPostLoginPath }

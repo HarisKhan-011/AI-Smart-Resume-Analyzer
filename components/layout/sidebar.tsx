@@ -28,7 +28,7 @@ export interface NavItem {
 
 export const candidateNavItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/resume/upload", label: "My Resumes", icon: FileText },
+  { href: "/resume", label: "My Resumes", icon: FileText },
   { href: "/job-match", label: "Check Job Match", icon: Search },
   { href: "/recommendations", label: "Recommended Jobs", icon: Briefcase },
   { href: "/skill-gap", label: "Skill Gap", icon: TrendingUp },

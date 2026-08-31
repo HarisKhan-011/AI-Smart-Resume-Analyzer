@@ -1,7 +1,10 @@
+import { isValidObjectId } from "mongoose"
 import { dbConnect } from "@/lib/mongodb"
 import { toStringId } from "@/lib/serialize"
 import { Resume, type ResumeDocument } from "@/models/resume"
 import type { AnalysisStatus, Education, Resume as ResumeDTO, WorkExperience } from "@/types/resume"
+
+export type ResumeSummary = Omit<ResumeDTO, "extractedText">
 
 export type CreateResumeInput = {
   userId: string
@@ -23,14 +26,14 @@ export type UpdateResumeInput = Partial<
   fileType?: string
 }
 
-function toResumeDTO(resume: ResumeDocument): ResumeDTO {
+function toResumeDTO(resume: ResumeDocument, includeText = false): ResumeDTO {
   return {
     id: toStringId(resume._id),
     userId: toStringId(resume.userId),
     fileName: resume.fileName,
     fileUrl: resume.fileUrl,
     fileType: resume.fileType,
-    extractedText: resume.extractedText,
+    extractedText: includeText ? resume.extractedText ?? "" : undefined,
     skills: resume.skills ?? [],
     experience: resume.experience ?? [],
     education: resume.education ?? [],
@@ -38,6 +41,12 @@ function toResumeDTO(resume: ResumeDocument): ResumeDTO {
     createdAt: resume.createdAt,
     updatedAt: resume.updatedAt,
   }
+}
+
+function toResumeSummary(resume: ResumeDocument): ResumeSummary {
+  const dto = toResumeDTO(resume, false)
+  const { extractedText: _extractedText, ...summary } = dto
+  return summary
 }
 
 export async function createResume(input: CreateResumeInput): Promise<ResumeDTO> {
@@ -53,32 +62,50 @@ export async function createResume(input: CreateResumeInput): Promise<ResumeDTO>
     education: input.education ?? [],
     analysisStatus: input.analysisStatus ?? "pending",
   })
-  return toResumeDTO(resume)
+  return toResumeDTO(resume, true)
 }
 
 export async function getResumeById(id: string): Promise<ResumeDTO | null> {
+  if (!isValidObjectId(id)) return null
   await dbConnect()
-  const resume = await Resume.findById(id)
-  return resume ? toResumeDTO(resume) : null
+  const resume = await Resume.findById(id).select("+extractedText")
+  return resume ? toResumeDTO(resume, true) : null
 }
 
-export async function listResumesByUser(userId: string): Promise<ResumeDTO[]> {
+export function ownedResumeFilter(id: string, userId: string) {
+  return { _id: id, userId }
+}
+
+export async function getOwnedResume(
+  id: string,
+  userId: string
+): Promise<ResumeDTO | null> {
+  if (!isValidObjectId(id)) return null
+  await dbConnect()
+  const resume = await Resume.findOne(ownedResumeFilter(id, userId)).select("+extractedText")
+  return resume ? toResumeDTO(resume, true) : null
+}
+
+export async function listResumesByUser(userId: string): Promise<ResumeSummary[]> {
   await dbConnect()
   const resumes = await Resume.find({ userId }).sort({ createdAt: -1 })
-  return resumes.map(toResumeDTO)
+  return resumes.map(toResumeSummary)
 }
 
 export async function updateResume(
   id: string,
   input: UpdateResumeInput
 ): Promise<ResumeDTO | null> {
+  if (!isValidObjectId(id)) return null
   await dbConnect()
   const resume = await Resume.findByIdAndUpdate(id, input, { new: true })
-  return resume ? toResumeDTO(resume) : null
+  return resume ? toResumeDTO(resume, false) : null
 }
 
-export async function deleteResume(id: string): Promise<boolean> {
+export async function deleteResume(id: string, userId?: string): Promise<boolean> {
+  if (!isValidObjectId(id)) return false
   await dbConnect()
-  const result = await Resume.findByIdAndDelete(id)
+  const filter = userId ? { _id: id, userId } : { _id: id }
+  const result = await Resume.findOneAndDelete(filter)
   return Boolean(result)
 }

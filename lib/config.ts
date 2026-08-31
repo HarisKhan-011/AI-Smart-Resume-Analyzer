@@ -12,7 +12,12 @@ export const config = {
   // Resume processing configuration
   resume: {
     maxFileSize: 5 * 1024 * 1024, // 5MB
-    allowedTypes: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    minExtractedLength: 30,
+    allowedExtensions: [".pdf", ".docx"] as const,
+    allowedTypes: [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ] as const,
   },
   
   // Matching algorithm configuration

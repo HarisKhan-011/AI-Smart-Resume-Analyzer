@@ -39,14 +39,17 @@ export function validateResumeFile(file: File): ValidationResult {
   const errors: string[] = []
   const allowedTypes = [
     "application/pdf",
-    "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ]
+  const name = file.name.toLowerCase()
+  const hasAllowedExtension = name.endsWith(".pdf") || name.endsWith(".docx")
 
   if (!file) {
     errors.push("File is required")
-  } else if (!allowedTypes.includes(file.type)) {
-    errors.push("Only PDF and Word documents are allowed")
+  } else if (!hasAllowedExtension) {
+    errors.push("Only PDF and DOCX files are allowed")
+  } else if (file.type && !allowedTypes.includes(file.type) && file.type !== "application/octet-stream") {
+    errors.push("Only PDF and DOCX files are allowed")
   } else if (file.size > 5 * 1024 * 1024) {
     errors.push("File size must be less than 5MB")
   }
