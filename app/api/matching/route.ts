@@ -1,9 +1,12 @@
-import { NextResponse } from 'next/server';
+import { getApiUser } from "@/lib/auth-utils"
+import { handleCreateMatchRequest } from "@/services/matching-http"
 
-export async function GET() {
-  return NextResponse.json({ message: 'Matching API - GET' });
-}
+export async function POST(request: Request) {
+  const user = await getApiUser()
+  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null
 
-export async function POST() {
-  return NextResponse.json({ message: 'Matching API - POST' });
+  return handleCreateMatchRequest(user, {
+    resumeId: typeof body?.resumeId === "string" ? body.resumeId : "",
+    jobId: typeof body?.jobId === "string" ? body.jobId : "",
+  })
 }

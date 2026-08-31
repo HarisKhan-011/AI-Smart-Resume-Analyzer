@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose"
 import { dbConnect } from "@/lib/mongodb"
 import { toStringId } from "@/lib/serialize"
 import { Match, type MatchDocument } from "@/models/match"
@@ -54,8 +55,20 @@ export async function upsertMatch(input: CreateMatchInput): Promise<MatchDTO> {
 }
 
 export async function getMatchById(id: string): Promise<MatchDTO | null> {
+  if (!isValidObjectId(id)) return null
   await dbConnect()
   const match = await Match.findById(id)
+  return match ? toMatchDTO(match) : null
+}
+
+export async function getMatchByResumeAndJob(
+  userId: string,
+  resumeId: string,
+  jobId: string
+): Promise<MatchDTO | null> {
+  if (!isValidObjectId(resumeId) || !isValidObjectId(jobId)) return null
+  await dbConnect()
+  const match = await Match.findOne({ userId, resumeId, jobId })
   return match ? toMatchDTO(match) : null
 }
 
