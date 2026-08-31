@@ -25,6 +25,7 @@ const ownedResume: Resume = {
   fileType: "pdf",
   extractedText: "Jane Candidate\nSoftware Engineer",
   skills: [],
+  extractedSkills: [],
   experience: [],
   education: [],
   analysisStatus: "pending",

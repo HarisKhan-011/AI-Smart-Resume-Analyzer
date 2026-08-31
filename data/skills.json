@@ -1,66 +1,339 @@
 {
-  "programming": [
-    "JavaScript",
-    "TypeScript",
-    "Python",
-    "Java",
-    "C++",
-    "C#",
-    "Go",
-    "Rust",
-    "PHP",
-    "Ruby"
-  ],
-  "frameworks": [
-    "React",
-    "Next.js",
-    "Vue.js",
-    "Angular",
-    "Node.js",
-    "Express.js",
-    "Django",
-    "Flask",
-    "Spring Boot",
-    "ASP.NET"
-  ],
-  "databases": [
-    "MongoDB",
-    "PostgreSQL",
-    "MySQL",
-    "Redis",
-    "SQLite",
-    "Oracle",
-    "Microsoft SQL Server",
-    "Elasticsearch"
-  ],
-  "cloud": [
-    "AWS",
-    "Google Cloud",
-    "Azure",
-    "Docker",
-    "Kubernetes",
-    "Terraform",
-    "Serverless",
-    "Lambda"
-  ],
-  "tools": [
-    "Git",
-    "GitHub",
-    "GitLab",
-    "Jira",
-    "Confluence",
-    "CI/CD",
-    "Jenkins",
-    "Webpack",
-    "Vite"
-  ],
-  "soft_skills": [
-    "Communication",
-    "Teamwork",
-    "Problem Solving",
-    "Leadership",
-    "Time Management",
-    "Adaptability",
-    "Critical Thinking"
+  "skills": [
+    {
+      "name": "JavaScript",
+      "category": "Programming Languages",
+      "aliases": ["JS", "Javascript", "ECMAScript", "ES6", "ES2015"]
+    },
+    {
+      "name": "TypeScript",
+      "category": "Programming Languages",
+      "aliases": ["TS", "Typescript"]
+    },
+    {
+      "name": "Python",
+      "category": "Programming Languages",
+      "aliases": ["Python3", "Python 3"]
+    },
+    {
+      "name": "Java",
+      "category": "Programming Languages",
+      "aliases": ["Java SE", "Java EE", "J2EE"]
+    },
+    {
+      "name": "C++",
+      "category": "Programming Languages",
+      "aliases": ["CPP", "C plus plus", "cplusplus"]
+    },
+    {
+      "name": "C#",
+      "category": "Programming Languages",
+      "aliases": ["CSharp", "C Sharp", "csharp"]
+    },
+    {
+      "name": "Go",
+      "category": "Programming Languages",
+      "aliases": ["Golang", "Go lang", "Go language"]
+    },
+    {
+      "name": "PHP",
+      "category": "Programming Languages",
+      "aliases": []
+    },
+    {
+      "name": "Ruby",
+      "category": "Programming Languages",
+      "aliases": ["Ruby on Rails language"]
+    },
+    {
+      "name": "Kotlin",
+      "category": "Programming Languages",
+      "aliases": []
+    },
+    {
+      "name": "Swift",
+      "category": "Programming Languages",
+      "aliases": []
+    },
+    {
+      "name": "Rust",
+      "category": "Programming Languages",
+      "aliases": []
+    },
+    {
+      "name": "SQL",
+      "category": "Programming Languages",
+      "aliases": ["Structured Query Language"]
+    },
+    {
+      "name": "HTML",
+      "category": "Web Development",
+      "aliases": ["HTML5"]
+    },
+    {
+      "name": "CSS",
+      "category": "Web Development",
+      "aliases": ["CSS3"]
+    },
+    {
+      "name": "React",
+      "category": "Web Development",
+      "aliases": ["ReactJS", "React.js", "React js"]
+    },
+    {
+      "name": "Next.js",
+      "category": "Web Development",
+      "aliases": ["NextJS", "Next.js", "Next js"]
+    },
+    {
+      "name": "Node.js",
+      "category": "Web Development",
+      "aliases": ["Node", "NodeJS", "Node.js", "Node js"]
+    },
+    {
+      "name": "Express",
+      "category": "Web Development",
+      "aliases": ["ExpressJS", "Express.js", "Express js"]
+    },
+    {
+      "name": "Vue",
+      "category": "Web Development",
+      "aliases": ["VueJS", "Vue.js", "Vue js"]
+    },
+    {
+      "name": "Angular",
+      "category": "Web Development",
+      "aliases": ["AngularJS", "Angular.js"]
+    },
+    {
+      "name": "Redux",
+      "category": "Web Development",
+      "aliases": []
+    },
+    {
+      "name": "Tailwind CSS",
+      "category": "Web Development",
+      "aliases": ["Tailwind", "TailwindCSS"]
+    },
+    {
+      "name": "REST",
+      "category": "Web Development",
+      "aliases": ["REST API", "RESTful", "RESTful API"]
+    },
+    {
+      "name": "GraphQL",
+      "category": "Web Development",
+      "aliases": []
+    },
+    {
+      "name": "MongoDB",
+      "category": "Databases",
+      "aliases": ["Mongo", "Mongo DB"]
+    },
+    {
+      "name": "PostgreSQL",
+      "category": "Databases",
+      "aliases": ["Postgres", "PostgresSQL"]
+    },
+    {
+      "name": "MySQL",
+      "category": "Databases",
+      "aliases": []
+    },
+    {
+      "name": "Redis",
+      "category": "Databases",
+      "aliases": []
+    },
+    {
+      "name": "SQLite",
+      "category": "Databases",
+      "aliases": []
+    },
+    {
+      "name": "Oracle",
+      "category": "Databases",
+      "aliases": ["Oracle DB", "Oracle Database"]
+    },
+    {
+      "name": "Firebase",
+      "category": "Databases",
+      "aliases": ["Firestore"]
+    },
+    {
+      "name": "AWS",
+      "category": "Cloud",
+      "aliases": ["Amazon Web Services", "Amazon AWS"]
+    },
+    {
+      "name": "Azure",
+      "category": "Cloud",
+      "aliases": ["Microsoft Azure"]
+    },
+    {
+      "name": "Google Cloud",
+      "category": "Cloud",
+      "aliases": ["GCP", "Google Cloud Platform"]
+    },
+    {
+      "name": "Vercel",
+      "category": "Cloud",
+      "aliases": []
+    },
+    {
+      "name": "Heroku",
+      "category": "Cloud",
+      "aliases": []
+    },
+    {
+      "name": "Machine Learning",
+      "category": "AI/ML",
+      "aliases": ["ML", "machine-learning"]
+    },
+    {
+      "name": "NLP",
+      "category": "AI/ML",
+      "aliases": ["Natural Language Processing"]
+    },
+    {
+      "name": "Deep Learning",
+      "category": "AI/ML",
+      "aliases": ["deep-learning"]
+    },
+    {
+      "name": "TensorFlow",
+      "category": "AI/ML",
+      "aliases": []
+    },
+    {
+      "name": "PyTorch",
+      "category": "AI/ML",
+      "aliases": ["Pytorch"]
+    },
+    {
+      "name": "scikit-learn",
+      "category": "AI/ML",
+      "aliases": ["sklearn", "scikit learn"]
+    },
+    {
+      "name": "Pandas",
+      "category": "AI/ML",
+      "aliases": []
+    },
+    {
+      "name": "NumPy",
+      "category": "AI/ML",
+      "aliases": ["Numpy"]
+    },
+    {
+      "name": "Docker",
+      "category": "DevOps",
+      "aliases": []
+    },
+    {
+      "name": "Kubernetes",
+      "category": "DevOps",
+      "aliases": ["K8s", "K8S"]
+    },
+    {
+      "name": "CI/CD",
+      "category": "DevOps",
+      "aliases": ["CICD", "Continuous Integration", "Continuous Delivery"]
+    },
+    {
+      "name": "Jenkins",
+      "category": "DevOps",
+      "aliases": []
+    },
+    {
+      "name": "GitHub Actions",
+      "category": "DevOps",
+      "aliases": ["Github Actions"]
+    },
+    {
+      "name": "Terraform",
+      "category": "DevOps",
+      "aliases": []
+    },
+    {
+      "name": "Linux",
+      "category": "DevOps",
+      "aliases": ["GNU/Linux"]
+    },
+    {
+      "name": "Nginx",
+      "category": "DevOps",
+      "aliases": []
+    },
+    {
+      "name": "Git",
+      "category": "Tools",
+      "aliases": ["GitHub Git", "Git VCS"]
+    },
+    {
+      "name": "GitHub",
+      "category": "Tools",
+      "aliases": ["Github"]
+    },
+    {
+      "name": "GitLab",
+      "category": "Tools",
+      "aliases": ["Gitlab"]
+    },
+    {
+      "name": "Jira",
+      "category": "Tools",
+      "aliases": []
+    },
+    {
+      "name": "Figma",
+      "category": "Tools",
+      "aliases": []
+    },
+    {
+      "name": "Postman",
+      "category": "Tools",
+      "aliases": []
+    },
+    {
+      "name": "VS Code",
+      "category": "Tools",
+      "aliases": ["VSCode", "Visual Studio Code"]
+    },
+    {
+      "name": "Webpack",
+      "category": "Tools",
+      "aliases": []
+    },
+    {
+      "name": "Communication",
+      "category": "Soft Skills",
+      "aliases": ["verbal communication", "written communication"]
+    },
+    {
+      "name": "Teamwork",
+      "category": "Soft Skills",
+      "aliases": ["team work", "collaboration", "collaborative"]
+    },
+    {
+      "name": "Leadership",
+      "category": "Soft Skills",
+      "aliases": ["team leadership"]
+    },
+    {
+      "name": "Problem Solving",
+      "category": "Soft Skills",
+      "aliases": ["problem-solving"]
+    },
+    {
+      "name": "Time Management",
+      "category": "Soft Skills",
+      "aliases": ["time-management"]
+    },
+    {
+      "name": "Critical Thinking",
+      "category": "Soft Skills",
+      "aliases": ["critical-thinking"]
+    }
   ]
 }

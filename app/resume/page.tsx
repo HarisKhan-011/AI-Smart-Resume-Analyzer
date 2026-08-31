@@ -46,7 +46,7 @@ export default async function ResumeListPage() {
               uploadedAt={resume.createdAt}
               analysisStatus={resume.analysisStatus}
               viewHref={`/resume/${resume.id}`}
-              analyzeHref={`/resume/analysis?resumeId=${resume.id}`}
+              analyzeHref={`/resume/${resume.id}`}
             />
           ))}
         </div>

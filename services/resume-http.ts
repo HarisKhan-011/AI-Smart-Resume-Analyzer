@@ -3,6 +3,10 @@ import { ResumeUploadError } from "@/lib/resume/file-validation"
 import { isDatabaseUnavailable } from "@/lib/mongodb"
 import { processResumeUpload } from "@/services/resume-upload-service"
 import {
+  analyzeOwnedResume,
+  ResumeAnalysisError,
+} from "@/services/resume-analysis-service"
+import {
   getOwnedResume,
   listResumesByUser,
   type ResumeSummary,
@@ -136,5 +140,49 @@ export async function handleGetResumeRequest(
       error: error instanceof Error ? error.message : "unknown",
     })
     return NextResponse.json({ error: "Unable to load resume." }, { status: 500 })
+  }
+}
+
+export async function handleAnalyzeResumeRequest(
+  user: ApiUser | null,
+  id: string,
+  analyze: typeof analyzeOwnedResume = analyzeOwnedResume
+) {
+  if (!user) {
+    return NextResponse.json({ error: "You must be signed in." }, { status: 401 })
+  }
+
+  try {
+    const result = await analyze(id, user.id)
+    return NextResponse.json({
+      resume: {
+        id: result.resume.id,
+        fileName: result.resume.fileName,
+        analysisStatus: result.resume.analysisStatus,
+        skills: result.resume.skills,
+      },
+      skills: result.skills,
+      skillCount: result.skillCount,
+    })
+  } catch (error) {
+    if (error instanceof ResumeAnalysisError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.status }
+      )
+    }
+
+    if (isDatabaseUnavailable(error)) {
+      return NextResponse.json(
+        { error: "Cannot analyze this resume because the database is unavailable." },
+        { status: 503 }
+      )
+    }
+
+    console.error("Resume analysis failed", {
+      userId: user.id,
+      error: error instanceof Error ? error.message : "unknown",
+    })
+    return NextResponse.json({ error: "Unable to analyze resume. Please try again." }, { status: 500 })
   }
 }

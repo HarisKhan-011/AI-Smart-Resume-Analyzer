@@ -19,6 +19,7 @@ function mockResume(fileType: "pdf" | "docx"): Resume {
     fileType,
     extractedText: extracted,
     skills: [],
+    extractedSkills: [],
     experience: [],
     education: [],
     analysisStatus: "pending",

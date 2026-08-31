@@ -15,6 +15,12 @@ export interface Education {
   graduationYear: string
 }
 
+export interface ExtractedSkill {
+  name: string
+  category: string
+  confidence: number
+}
+
 export interface ParsedResumeData {
   skills: string[]
   experience: WorkExperience[]
@@ -30,6 +36,7 @@ export interface Resume {
   fileType: string
   extractedText?: string
   skills: string[]
+  extractedSkills: ExtractedSkill[]
   experience: WorkExperience[]
   education: Education[]
   analysisStatus: AnalysisStatus

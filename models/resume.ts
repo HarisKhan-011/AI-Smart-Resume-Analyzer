@@ -1,5 +1,5 @@
 import { Schema, model, models, type Document, type Model, type Types } from "mongoose"
-import type { AnalysisStatus, Education, WorkExperience } from "@/types/resume"
+import type { AnalysisStatus, Education, ExtractedSkill, WorkExperience } from "@/types/resume"
 
 const WorkExperienceSchema = new Schema<WorkExperience>(
   {
@@ -22,6 +22,15 @@ const EducationSchema = new Schema<Education>(
   { _id: false }
 )
 
+const ExtractedSkillSchema = new Schema<ExtractedSkill>(
+  {
+    name: { type: String, required: true, trim: true },
+    category: { type: String, required: true, trim: true },
+    confidence: { type: Number, required: true, min: 0, max: 1 },
+  },
+  { _id: false }
+)
+
 export interface ResumeDocument extends Document {
   userId: Types.ObjectId
   fileName: string
@@ -29,6 +38,7 @@ export interface ResumeDocument extends Document {
   fileType: string
   extractedText?: string
   skills: string[]
+  extractedSkills: ExtractedSkill[]
   experience: WorkExperience[]
   education: Education[]
   analysisStatus: AnalysisStatus
@@ -65,6 +75,10 @@ const ResumeSchema = new Schema<ResumeDocument>(
     },
     skills: {
       type: [String],
+      default: [],
+    },
+    extractedSkills: {
+      type: [ExtractedSkillSchema],
       default: [],
     },
     experience: {

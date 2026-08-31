@@ -2,7 +2,13 @@ import { isValidObjectId } from "mongoose"
 import { dbConnect } from "@/lib/mongodb"
 import { toStringId } from "@/lib/serialize"
 import { Resume, type ResumeDocument } from "@/models/resume"
-import type { AnalysisStatus, Education, Resume as ResumeDTO, WorkExperience } from "@/types/resume"
+import type {
+  AnalysisStatus,
+  Education,
+  ExtractedSkill,
+  Resume as ResumeDTO,
+  WorkExperience,
+} from "@/types/resume"
 
 export type ResumeSummary = Omit<ResumeDTO, "extractedText">
 
@@ -13,6 +19,7 @@ export type CreateResumeInput = {
   fileType: string
   extractedText?: string
   skills?: string[]
+  extractedSkills?: ExtractedSkill[]
   experience?: WorkExperience[]
   education?: Education[]
   analysisStatus?: AnalysisStatus
@@ -35,6 +42,11 @@ function toResumeDTO(resume: ResumeDocument, includeText = false): ResumeDTO {
     fileType: resume.fileType,
     extractedText: includeText ? resume.extractedText ?? "" : undefined,
     skills: resume.skills ?? [],
+    extractedSkills: (resume.extractedSkills ?? []).map((skill) => ({
+      name: skill.name,
+      category: skill.category,
+      confidence: skill.confidence,
+    })),
     experience: resume.experience ?? [],
     education: resume.education ?? [],
     analysisStatus: resume.analysisStatus,
@@ -58,6 +70,7 @@ export async function createResume(input: CreateResumeInput): Promise<ResumeDTO>
     fileType: input.fileType,
     extractedText: input.extractedText ?? "",
     skills: input.skills ?? [],
+    extractedSkills: input.extractedSkills ?? [],
     experience: input.experience ?? [],
     education: input.education ?? [],
     analysisStatus: input.analysisStatus ?? "pending",
@@ -99,6 +112,19 @@ export async function updateResume(
   if (!isValidObjectId(id)) return null
   await dbConnect()
   const resume = await Resume.findByIdAndUpdate(id, input, { new: true })
+  return resume ? toResumeDTO(resume, false) : null
+}
+
+export async function updateOwnedResume(
+  id: string,
+  userId: string,
+  input: UpdateResumeInput
+): Promise<ResumeDTO | null> {
+  if (!isValidObjectId(id)) return null
+  await dbConnect()
+  const resume = await Resume.findOneAndUpdate(ownedResumeFilter(id, userId), input, {
+    new: true,
+  })
   return resume ? toResumeDTO(resume, false) : null
 }
 

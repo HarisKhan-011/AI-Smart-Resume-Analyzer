@@ -1,13 +1,13 @@
-import Link from "next/link"
 import { notFound } from "next/navigation"
 import { requireAuth } from "@/lib/auth-utils"
 import { getOwnedResume } from "@/services/resume-service"
+import { getSkillByName, loadSkillDictionary } from "@/services/nlp/skill-dictionary"
+import { ResumeAnalysisSection } from "@/components/resume/resume-analysis-section"
 import { PageHeader } from "@/components/shared/page-header"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatDate } from "@/lib/utils"
-import { FileText, Sparkles } from "lucide-react"
+import { FileText } from "lucide-react"
 
 interface ResumeDetailPageProps {
   params: Promise<{ id: string }>
@@ -22,21 +22,23 @@ export default async function ResumeDetailPage({ params }: ResumeDetailPageProps
     notFound()
   }
 
+  const dictionary = loadSkillDictionary()
+  const extractedSkills = (resume.extractedSkills ?? []).length > 0
+      ? resume.extractedSkills
+      : resume.skills.flatMap((name) => {
+          const definition = getSkillByName(name, dictionary)
+          return definition
+            ? [{ name: definition.name, category: definition.category, confidence: 0.9 }]
+            : []
+        })
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <PageHeader
-          title={resume.fileName}
-          description="Extracted resume text. Skill analysis will be added in a later phase."
-          icon={FileText}
-        />
-        <Button asChild>
-          <Link href={`/resume/analysis?resumeId=${resume.id}`}>
-            <Sparkles className="h-4 w-4" />
-            Analyze
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={resume.fileName}
+        description="Extracted text and NLP skill analysis for this resume."
+        icon={FileText}
+      />
 
       <div className="flex flex-wrap gap-2">
         <Badge variant="outline" className="uppercase">
@@ -47,6 +49,12 @@ export default async function ResumeDetailPage({ params }: ResumeDetailPageProps
           Uploaded {formatDate(resume.createdAt)}
         </span>
       </div>
+
+      <ResumeAnalysisSection
+        resumeId={resume.id}
+        analysisStatus={resume.analysisStatus}
+        initialSkills={extractedSkills}
+      />
 
       <Card>
         <CardHeader>
