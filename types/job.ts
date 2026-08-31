@@ -20,6 +20,8 @@ export interface Job {
   source: JobSource
   sourceUrl?: string | null
   postedDate: Date
+  isPosted?: boolean
+  isActive?: boolean
   createdAt: Date
   updatedAt: Date
   createdBy?: string | null

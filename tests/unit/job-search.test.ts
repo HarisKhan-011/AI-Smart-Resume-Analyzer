@@ -75,10 +75,22 @@ describe("job listing normalization", () => {
 })
 
 describe("job access", () => {
-  it("allows owners and public API jobs", () => {
+  it("allows owners, public API jobs, and active recruiter postings", () => {
     expect(canAccessJob({ createdBy: user.id, source: "manual" }, user.id)).toBe(true)
     expect(canAccessJob({ createdBy: null, source: "api" }, user.id)).toBe(true)
     expect(canAccessJob({ createdBy: "someone-else", source: "manual" }, user.id)).toBe(false)
+    expect(
+      canAccessJob(
+        { createdBy: "recruiter-1", source: "manual", isPosted: true, isActive: true },
+        user.id
+      )
+    ).toBe(true)
+    expect(
+      canAccessJob(
+        { createdBy: "recruiter-1", source: "manual", isPosted: true, isActive: false },
+        user.id
+      )
+    ).toBe(false)
   })
 
   it("returns 404 when a job is not accessible", async () => {

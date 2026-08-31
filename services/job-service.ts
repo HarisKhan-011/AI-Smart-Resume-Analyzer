@@ -15,6 +15,8 @@ export type CreateJobInput = {
   source?: JobSource
   sourceUrl?: string | null
   postedDate?: Date
+  isPosted?: boolean
+  isActive?: boolean
   createdBy?: string | null
 }
 
@@ -33,6 +35,8 @@ function toJobDTO(job: JobDocument): JobDTO {
     source: job.source,
     sourceUrl: job.sourceUrl ?? null,
     postedDate: job.postedDate,
+    isPosted: job.isPosted ?? false,
+    isActive: job.isActive !== false,
     createdAt: job.createdAt,
     updatedAt: job.updatedAt,
     createdBy: job.createdBy ? toStringId(job.createdBy) : null,
@@ -52,6 +56,8 @@ export async function createJob(input: CreateJobInput): Promise<JobDTO> {
     source: input.source ?? "manual",
     sourceUrl: input.sourceUrl ?? null,
     postedDate: input.postedDate ?? new Date(),
+    isPosted: input.isPosted ?? false,
+    isActive: input.isActive ?? true,
     createdBy: input.createdBy ?? null,
   })
   return toJobDTO(job)
@@ -72,10 +78,12 @@ export async function getOwnedJob(id: string, userId: string): Promise<JobDTO | 
 }
 
 export function canAccessJob(
-  job: Pick<JobDTO, "createdBy" | "source">,
+  job: Pick<JobDTO, "createdBy" | "source" | "isPosted" | "isActive">,
   userId: string
 ): boolean {
-  return job.createdBy === userId || job.source === "api"
+  if (job.createdBy === userId) return true
+  if (job.source === "api") return true
+  return Boolean(job.isPosted) && job.isActive !== false
 }
 
 export async function getAccessibleJob(id: string, userId: string): Promise<JobDTO | null> {
@@ -87,7 +95,11 @@ export async function getAccessibleJob(id: string, userId: string): Promise<JobD
 export async function listAccessibleJobs(userId: string): Promise<JobDTO[]> {
   await dbConnect()
   const jobs = await Job.find({
-    $or: [{ createdBy: userId }, { source: "api" }],
+    $or: [
+      { createdBy: userId },
+      { source: "api" },
+      { isPosted: true, isActive: { $ne: false } },
+    ],
   })
     .sort({ postedDate: -1, createdAt: -1 })
     .limit(80)
@@ -100,7 +112,11 @@ export async function listJobsForRecommendations(
 ): Promise<JobDTO[]> {
   await dbConnect()
   const jobs = await Job.find({
-    $or: [{ createdBy: userId }, { source: "api" }],
+    $or: [
+      { createdBy: userId },
+      { source: "api" },
+      { isPosted: true, isActive: { $ne: false } },
+    ],
     requiredSkills: { $exists: true, $ne: [] },
   })
     .sort({ postedDate: -1, createdAt: -1 })
@@ -142,6 +158,8 @@ export async function upsertJobBySource(input: CreateJobInput): Promise<JobDTO> 
     sourceUrl,
     postedDate: input.postedDate ?? new Date(),
     createdBy: input.createdBy ?? null,
+    isPosted: false,
+    isActive: true,
   }
 
   try {

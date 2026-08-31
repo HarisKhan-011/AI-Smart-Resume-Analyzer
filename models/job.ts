@@ -12,6 +12,8 @@ export interface JobDocument extends Document {
   source: JobSource
   sourceUrl?: string | null
   postedDate: Date
+  isPosted: boolean
+  isActive: boolean
   createdBy?: Types.ObjectId | null
   createdAt: Date
   updatedAt: Date
@@ -68,6 +70,16 @@ const JobSchema = new Schema<JobDocument>(
       default: Date.now,
       required: true,
     },
+    isPosted: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -91,6 +103,8 @@ JobSchema.index(
 JobSchema.index({ postedDate: -1 })
 JobSchema.index({ requiredSkills: 1 })
 JobSchema.index({ createdBy: 1 })
+JobSchema.index({ createdBy: 1, isPosted: 1 })
+JobSchema.index({ isPosted: 1, isActive: 1 })
 
 export const Job: Model<JobDocument> =
   (models.Job as Model<JobDocument> | undefined) ??

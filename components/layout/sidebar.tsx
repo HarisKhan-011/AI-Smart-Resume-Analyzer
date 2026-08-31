@@ -40,6 +40,7 @@ export const candidateNavItems: NavItem[] = [
 export const recruiterNavItems: NavItem[] = [
   { href: "/recruiter", label: "Dashboard", icon: LayoutDashboard },
   { href: "/recruiter/jobs", label: "My Jobs", icon: Briefcase },
+  { href: "/recruiter/jobs/new", label: "Post a Job", icon: Briefcase },
   { href: "/recruiter/candidates", label: "Candidates", icon: Users },
   { href: "/recruiter/rankings", label: "Candidate Rankings", icon: BarChart3 },
   { href: "/profile", label: "Profile", icon: User },
@@ -64,6 +65,7 @@ const exactMatchHrefs = new Set([
   "/admin",
   "/profile",
   "/settings",
+  "/recruiter/jobs/new",
 ])
 
 interface NavLinksProps {
