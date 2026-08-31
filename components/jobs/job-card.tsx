@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { formatDate } from "@/lib/utils"
+import { formatEmploymentType, jobSourceLabel } from "@/services/jobs/normalize-job"
 import { MapPin, Bookmark, Building2 } from "lucide-react"
 
 export interface JobCardProps {
@@ -11,9 +12,11 @@ export interface JobCardProps {
   company: string
   location: string
   employmentType?: string
+  source?: string
+  sourceUrl?: string | null
   matchScore?: number | null
   skills?: string[]
-  postedAt?: Date
+  postedAt?: Date | string
   href?: string
   onSave?: () => void
   requiredSkillCount?: number
@@ -24,6 +27,8 @@ export function JobCard({
   company,
   location,
   employmentType,
+  source,
+  sourceUrl,
   matchScore,
   skills = [],
   postedAt,
@@ -60,7 +65,12 @@ export function JobCard({
           </span>
           {employmentType && (
             <Badge variant="outline" className="text-xs">
-              {employmentType}
+              {formatEmploymentType(employmentType)}
+            </Badge>
+          )}
+          {source && (
+            <Badge variant="secondary" className="text-xs">
+              {jobSourceLabel(source, sourceUrl)}
             </Badge>
           )}
         </div>
@@ -91,7 +101,7 @@ export function JobCard({
       </CardContent>
       <CardFooter className="gap-2 pt-0">
         <Button asChild className="flex-1" size="sm">
-          <Link href={href}>View</Link>
+          <Link href={href}>View Job</Link>
         </Button>
         {onSave && (
           <Button

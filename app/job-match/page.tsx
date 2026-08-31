@@ -1,18 +1,29 @@
 import Link from "next/link"
 import { requireAuth } from "@/lib/auth-utils"
 import { listResumesByUser } from "@/services/resume-service"
-import { listJobsByUser } from "@/services/job-service"
+import { getAccessibleJob, listAccessibleJobs } from "@/services/job-service"
 import { JobMatchWorkspace } from "@/components/matching/job-match-workspace"
 import { PageHeader } from "@/components/shared/page-header"
 import { Button } from "@/components/ui/button"
 import { Search } from "lucide-react"
 
-export default async function JobMatchPage() {
+interface JobMatchPageProps {
+  searchParams: Promise<{ jobId?: string }>
+}
+
+export default async function JobMatchPage({ searchParams }: JobMatchPageProps) {
   const user = await requireAuth()
+  const params = await searchParams
   const [resumes, jobs] = await Promise.all([
     listResumesByUser(user.id),
-    listJobsByUser(user.id),
+    listAccessibleJobs(user.id),
   ])
+
+  const selectedJobId = params.jobId?.trim()
+  if (selectedJobId && !jobs.some((job) => job.id === selectedJobId)) {
+    const extra = await getAccessibleJob(selectedJobId, user.id)
+    if (extra) jobs.unshift(extra)
+  }
 
   return (
     <div className="space-y-6">
@@ -27,6 +38,7 @@ export default async function JobMatchPage() {
         </Button>
       </div>
       <JobMatchWorkspace
+        initialJobId={selectedJobId}
         resumes={resumes.map((resume) => ({
           id: resume.id,
           fileName: resume.fileName,

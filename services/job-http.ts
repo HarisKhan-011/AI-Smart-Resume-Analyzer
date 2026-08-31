@@ -5,7 +5,12 @@ import {
   JobAnalysisError,
   type AnalyzeJobInput,
 } from "@/services/job-analysis-service"
-import { getOwnedJob, listJobsByUser } from "@/services/job-service"
+import { getAccessibleJob, listJobsByUser } from "@/services/job-service"
+import {
+  JobProviderError,
+  type JobSearchQuery,
+} from "@/services/jobs/job-provider"
+import { searchAndStoreJobs } from "@/services/jobs/job-search-service"
 import type { Job } from "@/types/job"
 
 type ApiUser = {
@@ -15,7 +20,9 @@ type ApiUser = {
 type JobHttpDependencies = {
   analyzeJobDescription?: typeof analyzeJobDescription
   getOwnedJob?: (id: string, userId: string) => Promise<Job | null>
+  getAccessibleJob?: (id: string, userId: string) => Promise<Job | null>
   listJobsByUser?: (userId: string) => Promise<Job[]>
+  searchAndStoreJobs?: typeof searchAndStoreJobs
 }
 
 export async function handleAnalyzeJobRequest(
@@ -93,6 +100,51 @@ export async function handleListJobsRequest(
   }
 }
 
+export async function handleSearchJobsRequest(
+  user: ApiUser | null,
+  query: JobSearchQuery,
+  deps: JobHttpDependencies = {}
+) {
+  if (!user) {
+    return NextResponse.json({ error: "You must be signed in to search jobs." }, { status: 401 })
+  }
+
+  try {
+    const search = deps.searchAndStoreJobs ?? searchAndStoreJobs
+    const result = await search({
+      keyword: query.keyword?.trim().slice(0, 120),
+      location: query.location?.trim().slice(0, 120),
+      jobType: query.jobType?.trim().slice(0, 40),
+    })
+
+    return NextResponse.json({
+      jobs: result.jobs,
+      provider: result.provider,
+      fetched: result.fetched,
+    })
+  } catch (error) {
+    if (error instanceof JobProviderError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.status }
+      )
+    }
+
+    if (isDatabaseUnavailable(error)) {
+      return NextResponse.json(
+        { error: "Cannot save jobs because the database is unavailable." },
+        { status: 503 }
+      )
+    }
+
+    console.error("Job search failed", {
+      userId: user.id,
+      error: error instanceof Error ? error.message : "unknown",
+    })
+    return NextResponse.json({ error: "Unable to search jobs. Please try again." }, { status: 500 })
+  }
+}
+
 export async function handleGetJobRequest(
   user: ApiUser | null,
   id: string,
@@ -103,7 +155,7 @@ export async function handleGetJobRequest(
   }
 
   try {
-    const load = deps.getOwnedJob ?? getOwnedJob
+    const load = deps.getAccessibleJob ?? getAccessibleJob
     const job = await load(id, user.id)
     if (!job) {
       return NextResponse.json({ error: "Job not found." }, { status: 404 })

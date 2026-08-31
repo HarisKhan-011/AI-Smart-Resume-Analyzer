@@ -71,6 +71,87 @@ export async function getOwnedJob(id: string, userId: string): Promise<JobDTO | 
   return job ? toJobDTO(job) : null
 }
 
+export function canAccessJob(
+  job: Pick<JobDTO, "createdBy" | "source">,
+  userId: string
+): boolean {
+  return job.createdBy === userId || job.source === "api"
+}
+
+export async function getAccessibleJob(id: string, userId: string): Promise<JobDTO | null> {
+  const job = await getJobById(id)
+  if (!job || !canAccessJob(job, userId)) return null
+  return job
+}
+
+export async function listAccessibleJobs(userId: string): Promise<JobDTO[]> {
+  await dbConnect()
+  const jobs = await Job.find({
+    $or: [{ createdBy: userId }, { source: "api" }],
+  })
+    .sort({ postedDate: -1, createdAt: -1 })
+    .limit(80)
+  return jobs.map(toJobDTO)
+}
+
+export async function listPublicJobs(options?: {
+  limit?: number
+  employmentType?: string
+}): Promise<JobDTO[]> {
+  await dbConnect()
+  const query: Record<string, unknown> = { source: "api" }
+  if (options?.employmentType && options.employmentType !== "all") {
+    query.employmentType = options.employmentType
+  }
+  const jobs = await Job.find(query)
+    .sort({ postedDate: -1 })
+    .limit(options?.limit ?? 20)
+  return jobs.map(toJobDTO)
+}
+
+export async function upsertJobBySource(input: CreateJobInput): Promise<JobDTO> {
+  await dbConnect()
+  const sourceUrl = input.sourceUrl?.trim()
+  if (!sourceUrl) {
+    return createJob(input)
+  }
+
+  const payload = {
+    title: input.title,
+    company: input.company,
+    location: input.location,
+    description: input.description,
+    requiredSkills: input.requiredSkills ?? [],
+    preferredSkills: input.preferredSkills ?? [],
+    employmentType: input.employmentType ?? "full-time",
+    source: input.source ?? "api",
+    sourceUrl,
+    postedDate: input.postedDate ?? new Date(),
+    createdBy: input.createdBy ?? null,
+  }
+
+  try {
+    const job = await Job.findOneAndUpdate(
+      { source: payload.source, sourceUrl },
+      payload,
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    )
+
+    if (!job) {
+      throw new Error("Unable to save job listing.")
+    }
+
+    return toJobDTO(job)
+  } catch (error) {
+    const code = error && typeof error === "object" && "code" in error ? Number(error.code) : 0
+    if (code === 11000) {
+      const existing = await Job.findOne({ source: payload.source, sourceUrl })
+      if (existing) return toJobDTO(existing)
+    }
+    throw error
+  }
+}
+
 export async function listJobsByUser(userId: string): Promise<JobDTO[]> {
   await dbConnect()
   const jobs = await Job.find({ createdBy: userId }).sort({ createdAt: -1 }).limit(50)

@@ -3,7 +3,7 @@ import { isDatabaseUnavailable } from "@/lib/mongodb"
 import { matchOwnedResumeToJob, MatchingError } from "@/services/matching/run-match"
 import { getMatchByResumeAndJob } from "@/services/match-service"
 import { getOwnedResume } from "@/services/resume-service"
-import { getOwnedJob } from "@/services/job-service"
+import { getAccessibleJob } from "@/services/job-service"
 import { compareSkills } from "@/services/matching/compare-skills"
 import type { Job } from "@/types/job"
 import type { Resume } from "@/types/resume"
@@ -68,7 +68,7 @@ export async function handleGetMatchRequest(
 
   try {
     const loadResume = deps.getOwnedResume ?? getOwnedResume
-    const loadJob = deps.getOwnedJob ?? getOwnedJob
+    const loadJob = deps.getOwnedJob ?? getAccessibleJob
     const loadMatch = deps.getMatchByResumeAndJob ?? getMatchByResumeAndJob
 
     const resume = await loadResume(resumeId, user.id)

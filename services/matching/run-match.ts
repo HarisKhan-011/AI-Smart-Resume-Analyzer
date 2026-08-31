@@ -1,7 +1,7 @@
 import { isValidObjectId } from "mongoose"
 import { calculateMatch, type CalculatedMatch } from "@/services/matching/match-service"
 import { getOwnedResume } from "@/services/resume-service"
-import { getOwnedJob } from "@/services/job-service"
+import { getAccessibleJob } from "@/services/job-service"
 import { upsertMatch, type CreateMatchInput } from "@/services/match-service"
 import type { Job } from "@/types/job"
 import type { Match } from "@/types/matching"
@@ -28,14 +28,14 @@ export type MatchRunResult = {
 
 type RunMatchDependencies = {
   getOwnedResume: typeof getOwnedResume
-  getOwnedJob: typeof getOwnedJob
+  getOwnedJob: typeof getAccessibleJob
   calculateMatch: typeof calculateMatch
   saveMatch: typeof upsertMatch
 }
 
 const defaultDependencies: RunMatchDependencies = {
   getOwnedResume,
-  getOwnedJob,
+  getOwnedJob: getAccessibleJob,
   calculateMatch,
   saveMatch: upsertMatch,
 }

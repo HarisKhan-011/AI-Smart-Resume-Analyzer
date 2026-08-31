@@ -7,9 +7,11 @@ import { JobAnalyzeForm } from "@/components/jobs/job-analyze-form"
 export function JobMatchWorkspace({
   resumes,
   jobs,
+  initialJobId,
 }: {
   resumes: MatchResumeOption[]
   jobs: MatchJobOption[]
+  initialJobId?: string
 }) {
   return (
     <Tabs defaultValue="match" className="space-y-6">
@@ -18,7 +20,7 @@ export function JobMatchWorkspace({
         <TabsTrigger value="analyze">Analyze Job</TabsTrigger>
       </TabsList>
       <TabsContent value="match">
-        <CheckMatchForm resumes={resumes} jobs={jobs} />
+        <CheckMatchForm resumes={resumes} jobs={jobs} initialJobId={initialJobId} />
       </TabsContent>
       <TabsContent value="analyze">
         <JobAnalyzeForm />

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { requireAuth } from "@/lib/auth-utils"
 import { listResumesByUser } from "@/services/resume-service"
-import { listJobsByUser } from "@/services/job-service"
+import { listAccessibleJobs } from "@/services/job-service"
 import { SkillGapForm } from "@/components/skill-gap/skill-gap-form"
 import { PageHeader } from "@/components/shared/page-header"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ export default async function SkillGapPage() {
   const user = await requireAuth()
   const [resumes, jobs] = await Promise.all([
     listResumesByUser(user.id),
-    listJobsByUser(user.id),
+    listAccessibleJobs(user.id),
   ])
 
   return (

@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   FileText,
   Briefcase,
@@ -16,6 +18,7 @@ import {
   TrendingUp,
   Upload,
   Eye,
+  Search,
 } from "lucide-react"
 
 export default async function DashboardPage() {
@@ -42,6 +45,38 @@ export default async function DashboardPage() {
         <StatCard title="Jobs Matched" value="--" icon={Briefcase} description="Upload resume first" />
         <StatCard title="Applications" value="--" icon={ClipboardList} description="Not tracked yet" />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Search Jobs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form action="/jobs" method="GET" className="grid gap-4 sm:grid-cols-[1fr_1fr_auto]">
+            <div className="space-y-2">
+              <Label htmlFor="dashboard-job-keyword">Keyword</Label>
+              <Input
+                id="dashboard-job-keyword"
+                name="keyword"
+                placeholder="React, Python, designer"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dashboard-job-location">Location</Label>
+              <Input
+                id="dashboard-job-location"
+                name="location"
+                placeholder="Remote, London"
+              />
+            </div>
+            <div className="flex items-end">
+              <Button type="submit" className="w-full sm:w-auto">
+                <Search className="h-4 w-4" />
+                Search Jobs
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">

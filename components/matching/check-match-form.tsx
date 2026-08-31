@@ -81,12 +81,16 @@ function SkillGroup({
 export function CheckMatchForm({
   resumes,
   jobs,
+  initialJobId,
 }: {
   resumes: MatchResumeOption[]
   jobs: MatchJobOption[]
+  initialJobId?: string
 }) {
   const [resumeId, setResumeId] = useState(resumes[0]?.id ?? "")
-  const [jobId, setJobId] = useState(jobs[0]?.id ?? "")
+  const [jobId, setJobId] = useState(
+    jobs.some((job) => job.id === initialJobId) ? initialJobId ?? "" : jobs[0]?.id ?? ""
+  )
   const [isChecking, setIsChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<MatchResponse | null>(null)
@@ -129,9 +133,9 @@ export function CheckMatchForm({
           )}
           {jobs.length === 0 && (
             <p>
-              Analyze a job description first. Use the Analyze Job tab or{" "}
+              Analyze a job description or{" "}
               <Link href="/jobs" className="font-medium text-primary underline-offset-4 hover:underline">
-                view jobs
+                search online jobs
               </Link>
               .
             </p>

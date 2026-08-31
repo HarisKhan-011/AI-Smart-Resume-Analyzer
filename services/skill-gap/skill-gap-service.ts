@@ -2,7 +2,7 @@ import { calculateMatch, type CalculatedMatch } from "@/services/matching/match-
 import { getLearningSuggestion } from "@/lib/learning-suggestions"
 import { isValidObjectId } from "mongoose"
 import { getOwnedResume } from "@/services/resume-service"
-import { getOwnedJob } from "@/services/job-service"
+import { getAccessibleJob } from "@/services/job-service"
 import { upsertMatch } from "@/services/match-service"
 import { MatchingError } from "@/services/matching/run-match"
 import type { Match } from "@/types/matching"
@@ -32,14 +32,14 @@ export type OwnedSkillGapResult = SkillGapResult & {
 
 type SkillGapDependencies = {
   getOwnedResume: typeof getOwnedResume
-  getOwnedJob: typeof getOwnedJob
+  getOwnedJob: typeof getAccessibleJob
   saveMatch: typeof upsertMatch
   calculateMatch: typeof calculateMatch
 }
 
 const defaultDependencies: SkillGapDependencies = {
   getOwnedResume,
-  getOwnedJob,
+  getOwnedJob: getAccessibleJob,
   saveMatch: upsertMatch,
   calculateMatch,
 }

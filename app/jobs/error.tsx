@@ -11,7 +11,7 @@ export default function JobsError({
   return (
     <ErrorState
       title="Unable to load jobs"
-      message="We could not load your analyzed jobs. Please try again."
+      message="We could not load job listings. Please try again."
       onRetry={reset}
     />
   )
