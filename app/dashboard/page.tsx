@@ -2,6 +2,11 @@ import Link from "next/link"
 import { requireAuth } from "@/lib/auth-utils"
 import { listResumesByUser } from "@/services/resume-service"
 import { recommendJobsForUser } from "@/services/recommendations/recommendation-service"
+import { countOwnedApplicationsByStatus } from "@/services/applications/application-service"
+import {
+  APPLICATION_STATUS_ORDER,
+  applicationStatusLabel,
+} from "@/services/applications/status"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { PageHeader } from "@/components/shared/page-header"
@@ -22,13 +27,32 @@ import {
   Eye,
   Search,
   Lightbulb,
+  Bookmark,
+  Send,
+  MessageSquare,
+  Gift,
+  XCircle,
 } from "lucide-react"
+
+const APPLICATION_STATUS_ICONS = {
+  saved: Bookmark,
+  applied: Send,
+  interview: MessageSquare,
+  offered: Gift,
+  rejected: XCircle,
+} as const
 
 export default async function DashboardPage() {
   const user = await requireAuth()
   const resumes = await listResumesByUser(user.id)
   const recentResumes = resumes.slice(0, 5)
   const analyzedResume = resumes.find((resume) => resume.skills.length > 0)
+
+  const applicationCounts = await countOwnedApplicationsByStatus(user.id)
+  const applicationTotal = APPLICATION_STATUS_ORDER.reduce(
+    (sum, status) => sum + applicationCounts[status],
+    0
+  )
 
   let recommendedJobs: Awaited<ReturnType<typeof recommendJobsForUser>>["recommendations"] = []
   if (analyzedResume) {
@@ -62,8 +86,38 @@ export default async function DashboardPage() {
           icon={Briefcase}
           description={recommendedJobs.length ? "Suitable jobs ranked" : "Analyze a resume first"}
         />
-        <StatCard title="Applications" value="--" icon={ClipboardList} description="Not tracked yet" />
+        <StatCard
+          title="Applications"
+          value={applicationTotal}
+          icon={ClipboardList}
+          description={applicationTotal ? "Tracked in your pipeline" : "No applications tracked yet"}
+        />
       </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">Application Overview</CardTitle>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/applications">View applications</Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {APPLICATION_STATUS_ORDER.map((status) => {
+              const Icon = APPLICATION_STATUS_ICONS[status]
+              return (
+                <StatCard
+                  key={status}
+                  title={applicationStatusLabel(status)}
+                  value={applicationCounts[status]}
+                  icon={Icon}
+                  description="From your tracked jobs"
+                />
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

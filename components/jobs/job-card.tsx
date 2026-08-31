@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { formatDate } from "@/lib/utils"
 import { formatEmploymentType, jobSourceLabel } from "@/services/jobs/normalize-job"
-import { MapPin, Bookmark, Building2 } from "lucide-react"
+import { MapPin, Building2 } from "lucide-react"
+import { JobApplicationActions } from "@/components/applications/job-application-actions"
 
 export interface JobCardProps {
   id: string
@@ -19,12 +20,13 @@ export interface JobCardProps {
   postedAt?: Date | string
   href?: string
   checkMatchHref?: string
-  onSave?: () => void
+  showApplicationActions?: boolean
   requiredSkillCount?: number
   missingSkills?: string[]
 }
 
 export function JobCard({
+  id,
   title,
   company,
   location,
@@ -36,7 +38,7 @@ export function JobCard({
   postedAt,
   href = "#",
   checkMatchHref,
-  onSave,
+  showApplicationActions = true,
   requiredSkillCount,
   missingSkills = [],
 }: JobCardProps) {
@@ -125,25 +127,16 @@ export function JobCard({
           </p>
         )}
       </CardContent>
-      <CardFooter className="gap-2 pt-0">
+      <CardFooter className="flex flex-wrap gap-2 pt-0">
         <Button asChild className="flex-1" size="sm">
           <Link href={href}>View Job</Link>
         </Button>
         {checkMatchHref && (
-          <Button asChild variant="outline" className="flex-1" size="sm">
+          <Button asChild variant="outline" size="sm">
             <Link href={checkMatchHref}>Check Match</Link>
           </Button>
         )}
-        {onSave && (
-          <Button
-            variant="outline"
-            size="sm"
-            aria-label="Save job"
-            onClick={onSave}
-          >
-            <Bookmark className="h-4 w-4" />
-          </Button>
-        )}
+        {showApplicationActions && id && <JobApplicationActions jobId={id} />}
       </CardFooter>
     </Card>
   )

@@ -1,32 +1,26 @@
-import { FeaturePlaceholder } from "@/components/shared/feature-placeholder"
+import { requireAuth } from "@/lib/auth-utils"
+import { listOwnedApplicationsWithJobs } from "@/services/applications/application-service"
+import { ApplicationsBoard } from "@/components/applications/applications-board"
+import { PageHeader } from "@/components/shared/page-header"
 import { ClipboardList } from "lucide-react"
-import { EmptyState } from "@/components/dashboard/empty-state"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function ApplicationsPage() {
+interface ApplicationsPageProps {
+  searchParams: Promise<{ status?: string }>
+}
+
+export default async function ApplicationsPage({ searchParams }: ApplicationsPageProps) {
+  const user = await requireAuth()
+  const params = await searchParams
+  const items = await listOwnedApplicationsWithJobs(user.id)
+
   return (
     <div className="space-y-6">
-      <FeaturePlaceholder
+      <PageHeader
         title="Applications"
-        description="Track your job applications in one place."
+        description="Save jobs, track applications, and update status as you move through the process."
         icon={ClipboardList}
-        actionLabel="Explore Jobs"
-        actionHref="/jobs"
       />
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Your Applications</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <EmptyState
-            icon={ClipboardList}
-            title="No applications tracked"
-            description="You haven't tracked any applications yet."
-            actionText="Explore Jobs"
-            actionHref="/jobs"
-          />
-        </CardContent>
-      </Card>
+      <ApplicationsBoard initialItems={items} initialStatus={params.status?.trim() || "all"} />
     </div>
   )
 }
