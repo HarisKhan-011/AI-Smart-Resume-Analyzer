@@ -21,4 +21,34 @@ export const SKILL_CATEGORIES = {
   SOFT_SKILLS: 'soft_skills',
 } as const;
 
+export const ANALYSIS_STATUS = {
+  PENDING: 'pending',
+  PROCESSING: 'processing',
+  COMPLETED: 'completed',
+  FAILED: 'failed',
+} as const;
+
+export const EMPLOYMENT_TYPES = {
+  FULL_TIME: 'full-time',
+  PART_TIME: 'part-time',
+  CONTRACT: 'contract',
+  INTERNSHIP: 'internship',
+  FREELANCE: 'freelance',
+  TEMPORARY: 'temporary',
+} as const;
+
+export const JOB_SOURCES = {
+  MANUAL: 'manual',
+  API: 'api',
+  SCRAPE: 'scrape',
+} as const;
+
+export const APPLICATION_STATUS = {
+  SAVED: 'saved',
+  APPLIED: 'applied',
+  INTERVIEW: 'interview',
+  REJECTED: 'rejected',
+  OFFERED: 'offered',
+} as const;
+
 export const MATCH_THRESHOLD = 60; // Minimum match score to consider a job relevant

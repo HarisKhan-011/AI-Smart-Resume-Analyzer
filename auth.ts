@@ -1,10 +1,9 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { authConfig } from "@/auth.config"
-import { dbConnect } from "@/lib/db"
 import { verifyPassword } from "@/lib/password"
 import { loginSchema } from "@/lib/validations"
-import { User } from "@/models/user"
+import { findUserForAuth } from "@/services/user-service"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -22,11 +21,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         try {
-          await dbConnect()
-
-          const user = await User.findOne({
-            email: parsed.data.email.toLowerCase(),
-          }).select("+passwordHash")
+          const user = await findUserForAuth(parsed.data.email)
 
           if (!user?.passwordHash) {
             return null

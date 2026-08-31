@@ -32,8 +32,8 @@ export default function JobsPage() {
                 title={job.title}
                 company={job.company}
                 location={job.location}
-                skills={job.skills}
-                postedAt={job.postedAt}
+                skills={job.requiredSkills}
+                postedAt={job.postedDate}
                 employmentType="Full-time"
                 matchScore={null}
                 href={`/jobs/${job.id}`}

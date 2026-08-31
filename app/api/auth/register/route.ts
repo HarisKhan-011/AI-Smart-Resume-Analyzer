@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server"
-import { dbConnect, isDatabaseUnavailable } from "@/lib/db"
-import { hashPassword } from "@/lib/password"
+import { isDatabaseUnavailable } from "@/lib/mongodb"
 import { registerSchema } from "@/lib/validations"
-import { toPublicUser, User } from "@/models/user"
+import { createUser, userExistsByEmail } from "@/services/user-service"
 
 export async function POST(request: Request) {
   try {
@@ -21,25 +20,15 @@ export async function POST(request: Request) {
 
     const { name, email, password, role } = parsed.data
 
-    await dbConnect()
-
-    const existing = await User.findOne({ email })
-    if (existing) {
+    if (await userExistsByEmail(email)) {
       return NextResponse.json(
         { error: "An account with this email already exists." },
         { status: 409 }
       )
     }
 
-    const passwordHash = await hashPassword(password)
-    const user = await User.create({
-      name,
-      email,
-      passwordHash,
-      role,
-    })
-
-    return NextResponse.json({ user: toPublicUser(user) }, { status: 201 })
+    const user = await createUser({ name, email, password, role })
+    return NextResponse.json({ user }, { status: 201 })
   } catch (error) {
     if (
       typeof error === "object" &&
@@ -58,7 +47,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Cannot connect to MongoDB. Start MongoDB locally or set MONGODB_URI to a MongoDB Atlas connection string.",
+            "Cannot connect to MongoDB. Start MongoDB locally or set MONGODB_URI in .env.local to a MongoDB Atlas connection string.",
         },
         { status: 503 }
       )

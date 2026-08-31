@@ -6,7 +6,7 @@ export interface UserDocument extends Document {
   email: string
   passwordHash: string
   role: UserRole
-  image?: string
+  image?: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -58,6 +58,8 @@ const UserSchema = new Schema<UserDocument>(
     timestamps: true,
   }
 )
+
+UserSchema.index({ role: 1 })
 
 UserSchema.set("toJSON", {
   transform: (_doc, ret) => {

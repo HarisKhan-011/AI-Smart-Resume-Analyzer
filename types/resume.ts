@@ -1,30 +1,38 @@
-export interface Resume {
-  id: string;
-  userId: string;
-  fileName: string;
-  fileUrl: string;
-  uploadedAt: Date;
-  parsedData?: ParsedResumeData;
-}
-
-export interface ParsedResumeData {
-  skills: string[];
-  experience: WorkExperience[];
-  education: Education[];
-  summary?: string;
-}
+export type AnalysisStatus = "pending" | "processing" | "completed" | "failed"
 
 export interface WorkExperience {
-  company: string;
-  position: string;
-  startDate: string;
-  endDate?: string;
-  description?: string;
+  company: string
+  position: string
+  startDate: string
+  endDate?: string
+  description?: string
 }
 
 export interface Education {
-  institution: string;
-  degree: string;
-  field: string;
-  graduationYear: string;
+  institution: string
+  degree: string
+  field: string
+  graduationYear: string
+}
+
+export interface ParsedResumeData {
+  skills: string[]
+  experience: WorkExperience[]
+  education: Education[]
+  summary?: string
+}
+
+export interface Resume {
+  id: string
+  userId: string
+  fileName: string
+  fileUrl: string
+  fileType: string
+  extractedText?: string
+  skills: string[]
+  experience: WorkExperience[]
+  education: Education[]
+  analysisStatus: AnalysisStatus
+  createdAt: Date
+  updatedAt: Date
 }

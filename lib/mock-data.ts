@@ -3,23 +3,23 @@ import type { Job } from "@/types/job"
 /** Demo data for UI development only — not real user data */
 export const mockDemoJobs: Pick<
   Job,
-  "id" | "title" | "company" | "location" | "skills" | "postedAt"
+  "id" | "title" | "company" | "location" | "requiredSkills" | "postedDate"
 >[] = [
   {
     id: "demo-1",
     title: "Frontend Developer",
     company: "Demo Corp",
     location: "Remote",
-    skills: ["React", "TypeScript", "Next.js"],
-    postedAt: new Date("2026-01-15"),
+    requiredSkills: ["React", "TypeScript", "Next.js"],
+    postedDate: new Date("2026-01-15"),
   },
   {
     id: "demo-2",
     title: "Full Stack Engineer",
     company: "Sample Inc",
     location: "New York, NY",
-    skills: ["Node.js", "MongoDB", "React"],
-    postedAt: new Date("2026-01-10"),
+    requiredSkills: ["Node.js", "MongoDB", "React"],
+    postedDate: new Date("2026-01-10"),
   },
 ]
 

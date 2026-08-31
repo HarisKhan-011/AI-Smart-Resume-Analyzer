@@ -1,16 +1,26 @@
+export type EmploymentType =
+  | "full-time"
+  | "part-time"
+  | "contract"
+  | "internship"
+  | "freelance"
+  | "temporary"
+
+export type JobSource = "manual" | "api" | "scrape"
+
 export interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  description: string;
-  requirements: string[];
-  skills: string[];
-  salary?: {
-    min?: number;
-    max?: number;
-    currency?: string;
-  };
-  postedAt: Date;
-  expiresAt?: Date;
+  id: string
+  title: string
+  company: string
+  location: string
+  description: string
+  requiredSkills: string[]
+  preferredSkills: string[]
+  employmentType: EmploymentType
+  source: JobSource
+  sourceUrl?: string | null
+  postedDate: Date
+  createdAt: Date
+  updatedAt: Date
+  createdBy?: string | null
 }
