@@ -5,6 +5,7 @@ interface MatchScoreProps {
   score: number
   size?: "sm" | "md" | "lg"
   showLabel?: boolean
+  label?: string
 }
 
 const sizeClasses = {
@@ -36,7 +37,12 @@ function strokeColor(score: number): string {
   return "stroke-red-500"
 }
 
-export function MatchScore({ score, size = "md", showLabel = true }: MatchScoreProps) {
+export function MatchScore({
+  score,
+  size = "md",
+  showLabel = true,
+  label = "Match",
+}: MatchScoreProps) {
   const value = clampScore(score)
   const radius = 42
   const circumference = 2 * Math.PI * radius
@@ -75,7 +81,7 @@ export function MatchScore({ score, size = "md", showLabel = true }: MatchScoreP
             <span className={cn("font-bold", textSizes[size], scoreColor(value))}>
               {value}%
             </span>
-            {showLabel && <span className="text-xs text-muted-foreground">Match</span>}
+            {showLabel && <span className="text-xs text-muted-foreground">{label}</span>}
           </div>
         </div>
       </CardContent>

@@ -25,6 +25,7 @@ export const config = {
     threshold: 60, // Minimum match score percentage
     weight: {
       skills: 0.6,
+      semantic: 0.4,
       experience: 0.3,
       education: 0.1,
     },

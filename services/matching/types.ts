@@ -8,6 +8,7 @@ export type SkillComparison = {
 export type MatchScoreBreakdown = {
   overallScore: number
   skillScore: number
+  semanticScore: number
   experienceScore: number
   educationScore: number
 }

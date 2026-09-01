@@ -30,7 +30,7 @@ export default async function JobMatchPage({ searchParams }: JobMatchPageProps) 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <PageHeader
           title="Job Match"
-          description="Compare an analyzed resume with an analyzed job description."
+          description="Compare an analyzed resume with a job using skill match and semantic similarity."
           icon={Search}
         />
         <Button asChild variant="outline" className="sm:mt-1">

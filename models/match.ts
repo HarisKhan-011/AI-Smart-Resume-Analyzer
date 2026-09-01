@@ -6,6 +6,7 @@ export interface MatchDocument extends Document {
   jobId: Types.ObjectId
   overallScore: number
   skillScore: number
+  semanticScore: number
   experienceScore: number
   matchedSkills: string[]
   missingSkills: string[]
@@ -39,6 +40,7 @@ const MatchSchema = new Schema<MatchDocument>(
     },
     overallScore: scoreField,
     skillScore: scoreField,
+    semanticScore: scoreField,
     experienceScore: scoreField,
     matchedSkills: {
       type: [String],

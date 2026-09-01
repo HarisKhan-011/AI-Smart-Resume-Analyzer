@@ -29,6 +29,8 @@ type MatchResponse = {
   error?: string
   overallScore?: number
   skillScore?: number
+  semanticScore?: number
+  semanticAvailable?: boolean
   matchedSkills?: string[]
   missingSkills?: string[]
   preferredMatchedSkills?: string[]
@@ -212,19 +214,52 @@ export function CheckMatchForm({
       {result?.job && (
         <div className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-[auto_1fr]">
-            <MatchScore score={result.overallScore ?? 0} size="lg" />
+            <MatchScore score={result.overallScore ?? 0} size="lg" label="Overall" />
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Job Information</CardTitle>
+                <CardTitle className="text-lg">Match breakdown</CardTitle>
               </CardHeader>
               <CardContent className="space-y-1 text-sm">
+                <p><span className="font-medium">Overall Match:</span> {result.overallScore ?? 0}%</p>
+                <p><span className="font-medium">Skill Match:</span> {result.skillScore ?? 0}%</p>
+                <p>
+                  <span className="font-medium">Semantic Match:</span>{" "}
+                  {result.semanticAvailable === false
+                    ? "Unavailable — using skill match only"
+                    : `${result.semanticScore ?? 0}%`}
+                </p>
                 <p><span className="font-medium">Title:</span> {result.job.title}</p>
                 <p><span className="font-medium">Company:</span> {result.job.company}</p>
                 <p><span className="font-medium">Location:</span> {result.job.location}</p>
-                <p><span className="font-medium">Skill match:</span> {result.skillScore ?? 0}%</p>
                 {result.resume && (
                   <p><span className="font-medium">Resume:</span> {result.resume.fileName}</p>
                 )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Skill Match: {result.skillScore ?? 0}%</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Required-skill coverage from the Phase 8 keyword matcher.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  Semantic Match:{" "}
+                  {result.semanticAvailable === false ? "N/A" : `${result.semanticScore ?? 0}%`}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Cosine similarity between resume text and the job description.
+                </p>
               </CardContent>
             </Card>
           </div>

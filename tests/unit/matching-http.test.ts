@@ -55,6 +55,7 @@ function mockMatch(overrides: Partial<Match> = {}): Match {
     jobId,
     overallScore: 67,
     skillScore: 67,
+    semanticScore: 0,
     experienceScore: 0,
     matchedSkills: ["JavaScript", "React", "Node.js", "MongoDB"],
     missingSkills: ["AWS", "Docker"],
@@ -86,6 +87,7 @@ describe("matching API", () => {
     const comparison = {
       overallScore: 67,
       skillScore: 67,
+      semanticScore: 0,
       experienceScore: 0,
       educationScore: 0,
       matchedSkills: ["JavaScript", "React", "Node.js", "MongoDB"],
@@ -96,6 +98,7 @@ describe("matching API", () => {
     const run = jest.fn(async () => ({
       match: mockMatch(),
       comparison,
+      semanticAvailable: false,
       resume: { id: resumeId, fileName: "cv.pdf", analysisStatus: "completed" as const },
       job: {
         id: jobId,
@@ -130,11 +133,12 @@ describe("matchOwnedResumeToJob", () => {
   it("compares owned resume and job skills and persists the match", async () => {
     const saveMatch = jest.fn(async () => mockMatch())
     const result = await matchOwnedResumeToJob(userId, resumeId, jobId, {
-      getOwnedResume: jest.fn(async () => mockResume()),
+      getOwnedResume: jest.fn(async () => mockResume({ extractedText: "React developer" })),
       getOwnedJob: jest.fn(async () => mockJob()),
       calculateMatch: jest.fn(() => ({
         overallScore: 67,
         skillScore: 67,
+        semanticScore: 0,
         experienceScore: 0,
         educationScore: 0,
         matchedSkills: ["JavaScript", "React", "Node.js", "MongoDB"],
@@ -142,6 +146,7 @@ describe("matchOwnedResumeToJob", () => {
         preferredMatchedSkills: [],
         preferredMissingSkills: [],
       })),
+      calculateSemanticScore: jest.fn(async () => ({ semanticScore: 0, available: false })),
       saveMatch,
     })
 
@@ -151,9 +156,43 @@ describe("matchOwnedResumeToJob", () => {
         resumeId,
         jobId,
         overallScore: 67,
+        skillScore: 67,
+        semanticScore: 0,
         matchedSkills: ["JavaScript", "React", "Node.js", "MongoDB"],
       })
     )
     expect(result.match.overallScore).toBe(67)
+    expect(result.semanticAvailable).toBe(false)
+  })
+
+  it("combines skill and semantic scores when the AI service responds", async () => {
+    const saveMatch = jest.fn(async () => mockMatch({ overallScore: 87, skillScore: 92, semanticScore: 80 }))
+    const result = await matchOwnedResumeToJob(userId, resumeId, jobId, {
+      getOwnedResume: jest.fn(async () => mockResume({ extractedText: "Senior React engineer" })),
+      getOwnedJob: jest.fn(async () => mockJob({ description: "Looking for a React engineer" })),
+      calculateMatch: jest.fn(() => ({
+        overallScore: 92,
+        skillScore: 92,
+        semanticScore: 0,
+        experienceScore: 0,
+        educationScore: 0,
+        matchedSkills: ["JavaScript", "React", "Node.js", "MongoDB"],
+        missingSkills: ["AWS", "Docker"],
+        preferredMatchedSkills: [],
+        preferredMissingSkills: [],
+      })),
+      calculateSemanticScore: jest.fn(async () => ({ semanticScore: 80, available: true })),
+      saveMatch,
+    })
+
+    expect(saveMatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        overallScore: 87,
+        skillScore: 92,
+        semanticScore: 80,
+      })
+    )
+    expect(result.comparison.overallScore).toBe(87)
+    expect(result.semanticAvailable).toBe(true)
   })
 })

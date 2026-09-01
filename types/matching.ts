@@ -11,6 +11,7 @@ export interface Match {
   jobId: string
   overallScore: number
   skillScore: number
+  semanticScore: number
   experienceScore: number
   matchedSkills: string[]
   missingSkills: string[]

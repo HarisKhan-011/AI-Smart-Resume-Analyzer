@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "ai:embed": "python -m uvicorn --app-dir ai-service main:app --host 127.0.0.1 --port 8001"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",

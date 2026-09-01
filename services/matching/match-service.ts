@@ -5,9 +5,9 @@ import type { CalculatedMatch } from "@/services/matching/types"
 export type { CalculatedMatch, SkillComparison } from "@/services/matching/types"
 
 /**
- * Skills-only resume ↔ job matcher.
- * Experience, education, and semantic similarity can be added later
- * without changing the public calculateMatch() result shape.
+ * Skills-only resume ↔ job matcher (Phase 8).
+ * Semantic similarity is layered on in run-match without changing this result
+ * shape for recommendations, skill-gap, and recruiter fallback scoring.
  */
 export function calculateMatch(input: {
   resumeSkills: string[]

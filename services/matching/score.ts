@@ -19,8 +19,8 @@ export function coverageScore(matchedCount: number, totalCount: number): number 
 
 /**
  * Weighted overall score.
- * Disabled dimensions (experience/education/semantic) are ignored and
- * remaining weights are renormalized so skills-only scoring stays 0–100.
+ * Disabled dimensions (experience/education/semantic when AI is down) are ignored
+ * and remaining weights are renormalized so skills-only scoring stays 0–100.
  */
 export function weightedOverallScore(parts: ScorePart[]): number {
   const active = parts.filter((part) => part.enabled)
@@ -29,6 +29,28 @@ export function weightedOverallScore(parts: ScorePart[]): number {
 
   const raw = active.reduce((sum, part) => sum + part.score * (part.weight / totalWeight), 0)
   return roundScore(raw)
+}
+
+export function combineSkillAndSemanticScores(
+  skillScore: number,
+  semanticScore: number,
+  semanticAvailable: boolean
+): { overallScore: number; skillScore: number; semanticScore: number } {
+  const skills = roundScore(skillScore)
+  const semantic = semanticAvailable ? roundScore(semanticScore) : 0
+
+  return {
+    skillScore: skills,
+    semanticScore: semantic,
+    overallScore: weightedOverallScore([
+      { score: skills, weight: config.matching.weight.skills, enabled: true },
+      {
+        score: semantic,
+        weight: config.matching.weight.semantic,
+        enabled: semanticAvailable,
+      },
+    ]),
+  }
 }
 
 export function calculateMatchScores(input: {
@@ -41,6 +63,7 @@ export function calculateMatchScores(input: {
 
   return {
     skillScore,
+    semanticScore: 0,
     experienceScore: 0,
     educationScore: 0,
     overallScore: weightedOverallScore([

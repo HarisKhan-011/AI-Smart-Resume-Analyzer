@@ -10,6 +10,7 @@ export type CreateMatchInput = {
   jobId: string
   overallScore: number
   skillScore: number
+  semanticScore: number
   experienceScore: number
   matchedSkills?: string[]
   missingSkills?: string[]
@@ -23,6 +24,7 @@ function toMatchDTO(match: MatchDocument): MatchDTO {
     jobId: toStringId(match.jobId),
     overallScore: match.overallScore,
     skillScore: match.skillScore,
+    semanticScore: match.semanticScore ?? 0,
     experienceScore: match.experienceScore,
     matchedSkills: match.matchedSkills ?? [],
     missingSkills: match.missingSkills ?? [],
@@ -40,6 +42,7 @@ export async function upsertMatch(input: CreateMatchInput): Promise<MatchDTO> {
       jobId: input.jobId,
       overallScore: input.overallScore,
       skillScore: input.skillScore,
+      semanticScore: input.semanticScore,
       experienceScore: input.experienceScore,
       matchedSkills: input.matchedSkills ?? [],
       missingSkills: input.missingSkills ?? [],

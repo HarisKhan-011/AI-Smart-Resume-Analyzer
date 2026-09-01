@@ -1,5 +1,7 @@
 import { isValidObjectId } from "mongoose"
 import { calculateMatch, type CalculatedMatch } from "@/services/matching/match-service"
+import { combineSkillAndSemanticScores } from "@/services/matching/score"
+import { calculateSemanticScore } from "@/services/ai/semantic-matching"
 import { getOwnedResume } from "@/services/resume-service"
 import { getAccessibleJob } from "@/services/job-service"
 import { upsertMatch, type CreateMatchInput } from "@/services/match-service"
@@ -22,6 +24,7 @@ export class MatchingError extends Error {
 export type MatchRunResult = {
   match: Match
   comparison: CalculatedMatch
+  semanticAvailable: boolean
   resume: Pick<ResumeSummary, "id" | "fileName" | "analysisStatus">
   job: Pick<Job, "id" | "title" | "company" | "location" | "requiredSkills" | "preferredSkills">
 }
@@ -30,6 +33,7 @@ type RunMatchDependencies = {
   getOwnedResume: typeof getOwnedResume
   getOwnedJob: typeof getAccessibleJob
   calculateMatch: typeof calculateMatch
+  calculateSemanticScore: typeof calculateSemanticScore
   saveMatch: typeof upsertMatch
 }
 
@@ -37,6 +41,7 @@ const defaultDependencies: RunMatchDependencies = {
   getOwnedResume,
   getOwnedJob: getAccessibleJob,
   calculateMatch,
+  calculateSemanticScore,
   saveMatch: upsertMatch,
 }
 
@@ -44,18 +49,20 @@ export async function matchOwnedResumeToJob(
   userId: string,
   resumeId: string,
   jobId: string,
-  deps: RunMatchDependencies = defaultDependencies
+  deps: Partial<RunMatchDependencies> = {}
 ): Promise<MatchRunResult> {
+  const resolved: RunMatchDependencies = { ...defaultDependencies, ...deps }
+
   if (!isValidObjectId(resumeId) || !isValidObjectId(jobId)) {
     throw new MatchingError("A valid resume and job are required.", 400, "INVALID_IDS")
   }
 
-  const resume = await deps.getOwnedResume(resumeId, userId)
+  const resume = await resolved.getOwnedResume(resumeId, userId)
   if (!resume) {
     throw new MatchingError("Resume not found.", 404, "RESUME_NOT_FOUND")
   }
 
-  const job = await deps.getOwnedJob(jobId, userId)
+  const job = await resolved.getOwnedJob(jobId, userId)
   if (!job) {
     throw new MatchingError("Job not found.", 404, "JOB_NOT_FOUND")
   }
@@ -76,28 +83,48 @@ export async function matchOwnedResumeToJob(
     )
   }
 
-  const comparison = deps.calculateMatch({
+  const comparison = resolved.calculateMatch({
     resumeSkills: resume.skills,
     requiredSkills: job.requiredSkills,
     preferredSkills: job.preferredSkills,
   })
 
+  const semantic = await resolved.calculateSemanticScore(
+    resume.extractedText ?? "",
+    [job.title, job.company, job.description].filter(Boolean).join("\n")
+  ).catch(() => ({ semanticScore: 0, available: false }))
+
+  const combined = combineSkillAndSemanticScores(
+    comparison.skillScore,
+    semantic.semanticScore,
+    semantic.available
+  )
+
+  const scored: CalculatedMatch = {
+    ...comparison,
+    skillScore: combined.skillScore,
+    semanticScore: combined.semanticScore,
+    overallScore: combined.overallScore,
+  }
+
   const payload: CreateMatchInput = {
     userId,
     resumeId: resume.id,
     jobId: job.id,
-    overallScore: comparison.overallScore,
-    skillScore: comparison.skillScore,
-    experienceScore: comparison.experienceScore,
-    matchedSkills: comparison.matchedSkills,
-    missingSkills: comparison.missingSkills,
+    overallScore: scored.overallScore,
+    skillScore: scored.skillScore,
+    semanticScore: scored.semanticScore,
+    experienceScore: scored.experienceScore,
+    matchedSkills: scored.matchedSkills,
+    missingSkills: scored.missingSkills,
   }
 
-  const match = await deps.saveMatch(payload)
+  const match = await resolved.saveMatch(payload)
 
   return {
     match,
-    comparison,
+    comparison: scored,
+    semanticAvailable: semantic.available,
     resume: {
       id: resume.id,
       fileName: resume.fileName,

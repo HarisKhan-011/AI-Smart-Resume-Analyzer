@@ -139,6 +139,7 @@ export async function analyzeOwnedSkillGap(
     jobId: job.id,
     overallScore: comparison.overallScore,
     skillScore: comparison.skillScore,
+    semanticScore: comparison.semanticScore,
     experienceScore: comparison.experienceScore,
     matchedSkills: comparison.matchedSkills,
     missingSkills: comparison.missingSkills,

@@ -36,6 +36,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Python embedding service
+__pycache__/
+*.pyc
+ai-service/.venv
+ai-service/.cache
+
 # IDE
 .vscode
 .idea
