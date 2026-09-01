@@ -4,6 +4,7 @@ import { listRecruiterApplicants } from "@/services/recruiter/recruiter-candidat
 import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { ApplicationStatusBadge } from "@/components/applications/application-status-badge"
 import { Users } from "lucide-react"
@@ -50,7 +51,15 @@ export default async function RecruiterCandidatesPage() {
                       {item.resumeFileName ?? "No resume"}
                     </td>
                     <td className="px-4 py-3">{item.jobTitle}</td>
-                    <td className="px-4 py-3">{item.matchScore}%</td>
+                    <td className="px-4 py-3">
+                      <Badge
+                        variant={
+                          item.matchScore >= 80 ? "success" : item.matchScore >= 60 ? "warning" : "secondary"
+                        }
+                      >
+                        {item.matchScore}%
+                      </Badge>
+                    </td>
                     <td className="px-4 py-3">
                       <ApplicationStatusBadge status={item.status} />
                     </td>
@@ -72,8 +81,15 @@ export default async function RecruiterCandidatesPage() {
                   <p className="font-semibold">{item.candidateName}</p>
                   <p className="text-sm text-muted-foreground">{item.jobTitle}</p>
                   <p className="text-sm text-muted-foreground">
-                    Resume: {item.resumeFileName ?? "No resume"} · Match {item.matchScore}%
+                    Resume: {item.resumeFileName ?? "No resume"}
                   </p>
+                  <Badge
+                    variant={
+                      item.matchScore >= 80 ? "success" : item.matchScore >= 60 ? "warning" : "secondary"
+                    }
+                  >
+                    {item.matchScore}% match
+                  </Badge>
                   <ApplicationStatusBadge status={item.status} />
                   <Button asChild size="sm">
                     <Link href={`/recruiter/candidates/${item.candidateId}`}>View profile</Link>

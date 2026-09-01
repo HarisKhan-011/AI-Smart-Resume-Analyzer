@@ -91,7 +91,7 @@ export function ResumeAnalysisSection({
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          Detect skills from the extracted resume text. Job matching comes in a later phase.
+          Detect skills from the extracted resume text, then use Job Match to compare with a job.
         </p>
         <Button type="button" onClick={analyzeResume} disabled={isAnalyzing}>
           {isAnalyzing ? (
@@ -124,7 +124,13 @@ export function ResumeAnalysisSection({
           <CardTitle className="text-lg">Extracted Skills</CardTitle>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={status === "completed" ? "success" : status === "failed" ? "destructive" : "secondary"}>
-              {status}
+              {status === "completed"
+                ? "Analyzed"
+                : status === "failed"
+                  ? "Failed"
+                  : status === "processing"
+                    ? "Processing"
+                    : "Pending analysis"}
             </Badge>
             <Badge variant="outline">{skills.length} skill{skills.length === 1 ? "" : "s"} detected</Badge>
           </div>

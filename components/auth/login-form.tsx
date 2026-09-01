@@ -56,6 +56,11 @@ export function LoginForm() {
       }
 
       const sessionRes = await fetch("/api/auth/session")
+      if (!sessionRes.ok) {
+        router.push("/dashboard")
+        router.refresh()
+        return
+      }
       const session = (await sessionRes.json()) as {
         user?: { role?: UserRole }
       }

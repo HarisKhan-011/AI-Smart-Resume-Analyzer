@@ -10,7 +10,7 @@ export default function JobMatchError({
 }) {
   return (
     <ErrorState
-      title="Unable to analyze job"
+      title="Unable to check job match"
       message="Something went wrong on this page. Please try again."
       onRetry={reset}
     />

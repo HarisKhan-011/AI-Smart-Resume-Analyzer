@@ -44,7 +44,25 @@ export default async function ResumeDetailPage({ params }: ResumeDetailPageProps
         <Badge variant="outline" className="uppercase">
           {resume.fileType}
         </Badge>
-        <Badge variant="secondary">{resume.analysisStatus}</Badge>
+        <Badge
+          variant={
+            resume.analysisStatus === "completed"
+              ? "success"
+              : resume.analysisStatus === "failed"
+                ? "destructive"
+                : resume.analysisStatus === "processing"
+                  ? "warning"
+                  : "secondary"
+          }
+        >
+          {resume.analysisStatus === "completed"
+            ? "Analyzed"
+            : resume.analysisStatus === "failed"
+              ? "Failed"
+              : resume.analysisStatus === "processing"
+                ? "Processing"
+                : "Pending analysis"}
+        </Badge>
         <span className="text-sm text-muted-foreground">
           Uploaded {formatDate(resume.createdAt)}
         </span>
@@ -61,7 +79,7 @@ export default async function ResumeDetailPage({ params }: ResumeDetailPageProps
           <CardTitle className="text-lg">Extracted text</CardTitle>
         </CardHeader>
         <CardContent>
-          <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-lg bg-muted/40 p-4 text-sm leading-relaxed">
+          <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted/40 p-4 text-sm leading-relaxed">
             {resume.extractedText || "No text was extracted from this file."}
           </pre>
         </CardContent>

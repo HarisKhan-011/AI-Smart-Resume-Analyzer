@@ -8,7 +8,7 @@ export default function ResumeUploadPage() {
     <div className="space-y-6">
       <PageHeader
         title="Upload Resume"
-        description="Upload a PDF or DOCX resume. We will extract the text now; AI analysis comes in a later phase."
+        description="Upload a PDF or DOCX resume. Text is extracted immediately; open the resume to run skill analysis."
         icon={Upload}
       />
       <Card>

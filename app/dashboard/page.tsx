@@ -79,7 +79,18 @@ export default async function DashboardPage() {
           icon={FileText}
           description={resumes.length ? "Uploaded" : "No resume uploaded yet"}
         />
-        <StatCard title="Resume Score" value="--%" icon={Sparkles} description="No analysis yet" />
+        <StatCard
+          title="Best match"
+          value={recommendedJobs[0] ? `${recommendedJobs[0].overallScore}%` : "--%"}
+          icon={Sparkles}
+          description={
+            recommendedJobs[0]
+              ? recommendedJobs[0].job.title
+              : analyzedResume
+                ? "No matching jobs yet"
+                : "Analyze a resume first"
+          }
+        />
         <StatCard
           title="Jobs Matched"
           value={recommendedJobs.length ? recommendedJobs.length : "--"}
@@ -221,7 +232,23 @@ export default async function DashboardPage() {
                       <Badge variant="outline" className="uppercase">
                         {resume.fileType}
                       </Badge>
-                      <span className="capitalize">{resume.analysisStatus}</span>
+                      <Badge
+                        variant={
+                          resume.analysisStatus === "completed"
+                            ? "success"
+                            : resume.analysisStatus === "failed"
+                              ? "destructive"
+                              : "secondary"
+                        }
+                      >
+                        {resume.analysisStatus === "completed"
+                          ? "Analyzed"
+                          : resume.analysisStatus === "failed"
+                            ? "Failed"
+                            : resume.analysisStatus === "processing"
+                              ? "Processing"
+                              : "Pending analysis"}
+                      </Badge>
                       <span>{formatDate(resume.createdAt)}</span>
                     </div>
                   </div>
@@ -241,31 +268,67 @@ export default async function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Recent Job Matches</CardTitle>
+            <CardTitle className="text-lg">Recent job matches</CardTitle>
           </CardHeader>
           <CardContent>
-            <EmptyState
-              icon={Briefcase}
-              title="No job matches yet"
-              description="Analyze a job description to see your compatibility."
-              actionText="Check Job Match"
-              actionHref="/job-match"
-            />
+            {recommendedJobs.length === 0 ? (
+              <EmptyState
+                icon={Briefcase}
+                title="No job matches yet"
+                description="Analyze a resume and search jobs to see compatibility scores."
+                actionText="Check Job Match"
+                actionHref="/job-match"
+              />
+            ) : (
+              <ul className="divide-y">
+                {recommendedJobs.slice(0, 3).map((item) => (
+                  <li key={item.jobId} className="flex items-center justify-between gap-3 py-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{item.job.title}</p>
+                      <p className="truncate text-sm text-muted-foreground">{item.job.company}</p>
+                    </div>
+                    <Badge
+                      variant={item.overallScore >= 80 ? "success" : item.overallScore >= 60 ? "warning" : "secondary"}
+                    >
+                      {item.overallScore}%
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Skill Gaps</CardTitle>
+            <CardTitle className="text-lg">Skill gaps</CardTitle>
           </CardHeader>
           <CardContent>
-            <EmptyState
-              icon={TrendingUp}
-              title="No skill gaps identified"
-              description="Compare your resume with a job to find skill gaps."
-              actionText="View Skill Gap"
-              actionHref="/skill-gap"
-            />
+            {!recommendedJobs[0]?.missingSkills.length ? (
+              <EmptyState
+                icon={TrendingUp}
+                title="No skill gaps identified"
+                description="Compare your resume with a job to find missing required skills."
+                actionText="View Skill Gap"
+                actionHref="/skill-gap"
+              />
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Missing required skills for {recommendedJobs[0].job.title}.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {recommendedJobs[0].missingSkills.slice(0, 8).map((skill) => (
+                    <Badge key={skill} variant="outline">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/skill-gap">View skill gap</Link>
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

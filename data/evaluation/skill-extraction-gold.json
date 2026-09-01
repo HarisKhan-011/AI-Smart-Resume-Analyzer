@@ -1,0 +1,27 @@
+[
+  {
+    "id": "frontend-resume",
+    "text": "Software engineer experienced with JavaScript, React, Node.js, and MongoDB. Built REST APIs and single-page apps.",
+    "goldSkills": ["JavaScript", "React", "Node.js", "MongoDB"]
+  },
+  {
+    "id": "python-data",
+    "text": "Data analyst using Python, Pandas, NumPy, and SQL for reporting dashboards.",
+    "goldSkills": ["Python", "Pandas", "NumPy", "SQL"]
+  },
+  {
+    "id": "cloud-devops",
+    "text": "DevOps engineer. AWS, Docker, Kubernetes, and Terraform for production infrastructure.",
+    "goldSkills": ["AWS", "Docker", "Kubernetes", "Terraform"]
+  },
+  {
+    "id": "java-backend",
+    "text": "Backend developer with Java, PostgreSQL, Linux, and Git.",
+    "goldSkills": ["Java", "PostgreSQL", "Linux", "Git"]
+  },
+  {
+    "id": "unrelated-prose",
+    "text": "I enjoy hiking, cooking, and photography on weekends. No technical tools mentioned here.",
+    "goldSkills": []
+  }
+]

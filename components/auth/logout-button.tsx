@@ -13,7 +13,11 @@ interface LogoutButtonProps {
 export function LogoutButton({ collapsed = false, className, onClick }: LogoutButtonProps) {
   async function handleLogout() {
     onClick?.()
-    await signOut({ callbackUrl: "/login" })
+    try {
+      await signOut({ callbackUrl: "/login" })
+    } catch {
+      window.location.href = "/login"
+    }
   }
 
   return (

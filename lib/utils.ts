@@ -28,19 +28,3 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
-
-export function calculateMatchScore(
-  resumeSkills: string[],
-  jobSkills: string[]
-): number {
-  if (jobSkills.length === 0) return 0;
-  
-  const matchedSkills = resumeSkills.filter(skill =>
-    jobSkills.some(jobSkill =>
-      jobSkill.toLowerCase().includes(skill.toLowerCase()) ||
-      skill.toLowerCase().includes(jobSkill.toLowerCase())
-    )
-  );
-  
-  return (matchedSkills.length / jobSkills.length) * 100;
-}

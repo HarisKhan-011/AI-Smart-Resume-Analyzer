@@ -162,7 +162,7 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
           <CardTitle className="text-lg">Job description</CardTitle>
         </CardHeader>
         <CardContent>
-          <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-lg bg-muted/40 p-4 text-sm leading-relaxed">
+          <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted/40 p-4 text-sm leading-relaxed">
             {job.description}
           </pre>
         </CardContent>

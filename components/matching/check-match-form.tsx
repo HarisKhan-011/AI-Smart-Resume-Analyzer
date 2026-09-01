@@ -245,7 +245,7 @@ export function CheckMatchForm({
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Required-skill coverage from the Phase 8 keyword matcher.
+                  Required-skill coverage from dictionary keyword matching.
                 </p>
               </CardContent>
             </Card>

@@ -1,8 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import { Bell, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { UserMenu } from "./user-menu"
 import { MobileMenuButton } from "./mobile-navigation"
@@ -12,7 +11,7 @@ const pageTitles: Record<string, string> = {
   "/resume": "My Resumes",
   "/resume/upload": "Upload Resume",
   "/resume/analysis": "Resume Analysis",
-  "/job-match": "Check Job Match",
+  "/job-match": "Job Match",
   "/recommendations": "Recommended Jobs",
   "/skill-gap": "Skill Gap",
   "/applications": "Applications",
@@ -20,6 +19,7 @@ const pageTitles: Record<string, string> = {
   "/jobs": "Jobs",
   "/recruiter": "Recruiter Dashboard",
   "/recruiter/jobs": "My Jobs",
+  "/recruiter/jobs/new": "Post a Job",
   "/recruiter/candidates": "Candidates",
   "/recruiter/rankings": "Candidate Rankings",
   "/settings": "Settings",
@@ -30,6 +30,8 @@ function getPageTitle(pathname: string): string {
   if (pageTitles[pathname]) return pageTitles[pathname]
   if (pathname.startsWith("/resume/")) return "Resume"
   if (pathname.startsWith("/jobs/")) return "Job Details"
+  if (pathname.startsWith("/recruiter/candidates/")) return "Candidate"
+  if (pathname.startsWith("/recruiter/jobs/") && pathname.endsWith("/edit")) return "Edit Job"
   return "Dashboard"
 }
 
@@ -50,25 +52,22 @@ export function Topbar({ title, onMenuClick, showSearch = true }: TopbarProps) {
         <h1 className="truncate text-lg font-semibold sm:text-xl">{displayTitle}</h1>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-4">
         {showSearch && (
-          <div className="relative hidden md:block">
+          <form action="/jobs" method="GET" className="relative hidden md:block">
             <Search
               className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
               aria-hidden="true"
             />
             <Input
               type="search"
-              placeholder="Search..."
-              className="w-48 pl-10 lg:w-64"
-              aria-label="Search"
+              name="keyword"
+              placeholder="Search jobs..."
+              className="w-40 pl-10 lg:w-64"
+              aria-label="Search jobs"
             />
-          </div>
+          </form>
         )}
-
-        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
-          <Bell className="h-5 w-5" />
-        </Button>
 
         <UserMenu />
       </div>

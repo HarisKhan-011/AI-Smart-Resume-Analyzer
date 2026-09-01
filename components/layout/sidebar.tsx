@@ -17,6 +17,7 @@ import {
   Users,
   BarChart3,
   Shield,
+  Sparkles,
   LucideIcon,
 } from "lucide-react"
 
@@ -29,9 +30,9 @@ export interface NavItem {
 export const candidateNavItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/resume", label: "My Resumes", icon: FileText },
-  { href: "/job-match", label: "Analyze Job", icon: Search },
+  { href: "/job-match", label: "Job Match", icon: Search },
   { href: "/jobs", label: "Jobs", icon: Briefcase },
-  { href: "/recommendations", label: "Recommended Jobs", icon: Briefcase },
+  { href: "/recommendations", label: "Recommended Jobs", icon: Sparkles },
   { href: "/skill-gap", label: "Skill Gap", icon: TrendingUp },
   { href: "/applications", label: "Applications", icon: ClipboardList },
   { href: "/profile", label: "Profile", icon: User },

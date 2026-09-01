@@ -25,7 +25,7 @@ export default async function RecruiterRankingsPage({ searchParams }: RankingsPa
     <div className="space-y-6">
       <PageHeader
         title="Candidate Rankings"
-        description="Applicants for a selected job, ranked with the Phase 8 skill matcher."
+        description="Applicants for a selected job, ranked by skill match."
         icon={BarChart3}
       />
 
