@@ -11,8 +11,11 @@ import { JobCard } from "@/components/jobs/job-card"
 import { EmptyState } from "@/components/dashboard/empty-state"
 import { JobCardSkeleton } from "@/components/dashboard/skeletons"
 import { EMPLOYMENT_TYPES } from "@/lib/constants"
+import { config } from "@/lib/config"
 import { cn } from "@/lib/utils"
-import { formatEmploymentType } from "@/services/jobs/normalize-job"
+import { DatePostedFilter } from "@/components/jobs/date-posted-filter"
+import { KeywordSuggestInput } from "@/components/jobs/keyword-suggest-input"
+import { formatEmploymentType, filterSearchJobs, resolveJobSearchLocation, resolvePostedWithin, type PostedWithin } from "@/services/jobs/normalize-job"
 import type { Job } from "@/types/job"
 
 const selectClassName =
@@ -21,6 +24,7 @@ const selectClassName =
 type SearchJobsResponse = {
   error?: string
   jobs?: Job[]
+  warning?: string | null
 }
 
 const JOB_TYPE_OPTIONS = [
@@ -35,35 +39,48 @@ export function JobSearchPanel({
   initialKeyword = "",
   initialLocation = "",
   initialJobType = "all",
+  initialPostedWithin = "all",
 }: {
   initialKeyword?: string
   initialLocation?: string
   initialJobType?: string
+  initialPostedWithin?: string
 }) {
   const router = useRouter()
   const pathname = usePathname()
   const [keyword, setKeyword] = useState(initialKeyword)
-  const [location, setLocation] = useState(initialLocation)
+  const [location, setLocation] = useState(resolveJobSearchLocation(initialLocation))
   const [jobType, setJobType] = useState(initialJobType || "all")
+  const [postedWithin, setPostedWithin] = useState<PostedWithin>(
+    resolvePostedWithin(initialPostedWithin)
+  )
   const [jobs, setJobs] = useState<Job[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [warning, setWarning] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
 
-  async function runSearch(next = { keyword, location, jobType }) {
+  async function runSearch(
+    next = { keyword, location, jobType, postedWithin }
+  ) {
     abortRef.current?.abort()
     const controller = new AbortController()
     abortRef.current = controller
 
     setIsLoading(true)
     setError(null)
+    setWarning(null)
     setHasSearched(true)
+
+    const resolvedLocation = resolveJobSearchLocation(next.location)
+    setLocation(resolvedLocation)
 
     const params = new URLSearchParams()
     if (next.keyword.trim()) params.set("keyword", next.keyword.trim())
-    if (next.location.trim()) params.set("location", next.location.trim())
+    params.set("location", resolvedLocation)
     if (next.jobType && next.jobType !== "all") params.set("jobType", next.jobType)
+    if (next.postedWithin && next.postedWithin !== "all") params.set("posted", next.postedWithin)
 
     const query = params.toString()
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
@@ -78,6 +95,7 @@ export function JobSearchPanel({
         throw new Error(body.error ?? "Unable to search jobs.")
       }
       setJobs(body.jobs ?? [])
+      setWarning(body.warning ?? null)
     } catch (searchError) {
       if (searchError instanceof DOMException && searchError.name === "AbortError") return
       setJobs([])
@@ -88,19 +106,14 @@ export function JobSearchPanel({
   }
 
   useEffect(() => {
-    const shouldSearch =
-      Boolean(initialKeyword.trim()) ||
-      Boolean(initialLocation.trim()) ||
-      Boolean(initialJobType && initialJobType !== "all")
-    if (shouldSearch) {
-      void runSearch({
-        keyword: initialKeyword,
-        location: initialLocation,
-        jobType: initialJobType || "all",
-      })
-    }
+    void runSearch({
+      keyword: initialKeyword,
+      location: resolveJobSearchLocation(initialLocation),
+      jobType: initialJobType || "all",
+      postedWithin: resolvePostedWithin(initialPostedWithin),
+    })
     return () => abortRef.current?.abort()
-    // Search once from the URL on first load.
+    // Search Pakistan jobs once from the URL on first load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -108,6 +121,13 @@ export function JobSearchPanel({
     event.preventDefault()
     await runSearch()
   }
+
+  function onPostedWithinChange(next: PostedWithin) {
+    setPostedWithin(next)
+    void runSearch({ keyword, location, jobType, postedWithin: next })
+  }
+
+  const visibleJobs = filterSearchJobs(jobs, { keyword, location, jobType, postedWithin })
 
   return (
     <div className="space-y-6">
@@ -117,11 +137,14 @@ export function JobSearchPanel({
       >
         <div className="space-y-2">
           <Label htmlFor="job-keyword">Search keyword</Label>
-          <Input
+          <KeywordSuggestInput
             id="job-keyword"
             name="keyword"
             value={keyword}
-            onChange={(event) => setKeyword(event.target.value)}
+            onChange={setKeyword}
+            onPick={(next) => {
+              void runSearch({ keyword: next, location, jobType, postedWithin })
+            }}
             placeholder="React, Python, product manager"
             disabled={isLoading}
           />
@@ -133,7 +156,7 @@ export function JobSearchPanel({
             name="location"
             value={location}
             onChange={(event) => setLocation(event.target.value)}
-            placeholder="Remote, London, New York"
+            placeholder={config.jobs.locationPlaceholder}
             disabled={isLoading}
           />
         </div>
@@ -166,11 +189,25 @@ export function JobSearchPanel({
         </div>
       </form>
 
+      <DatePostedFilter
+        value={postedWithin}
+        disabled={isLoading}
+        onChange={onPostedWithinChange}
+      />
+
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Search failed</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {warning && !error && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Notice</AlertTitle>
+          <AlertDescription>{warning}</AlertDescription>
         </Alert>
       )}
 
@@ -191,17 +228,23 @@ export function JobSearchPanel({
         />
       )}
 
-      {!isLoading && hasSearched && !error && jobs.length === 0 && (
+      {!isLoading && hasSearched && !error && visibleJobs.length === 0 && (
         <EmptyState
           icon={Briefcase}
-          title="No jobs found"
-          description="Try a different keyword, location, or job type. Remote-friendly roles work best with the default job source."
+          title="No matching jobs"
+          description={
+            postedWithin !== "all"
+              ? "No jobs were posted in that time window. Reset Date posted, or try Past week or Past month."
+              : keyword.trim()
+                ? "This Pakistan job board has no listings for that keyword in this city. Try a broader title, or add a Jooble API key for more private-sector jobs."
+                : "Try another city, such as Lahore, Karachi, or Islamabad, or a different keyword."
+          }
         />
       )}
 
-      {!isLoading && jobs.length > 0 && (
+      {!isLoading && visibleJobs.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2">
-          {jobs.map((job) => (
+          {visibleJobs.map((job) => (
             <JobCard
               key={job.id}
               id={job.id}

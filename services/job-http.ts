@@ -11,6 +11,7 @@ import {
   type JobSearchQuery,
 } from "@/services/jobs/job-provider"
 import { searchAndStoreJobs } from "@/services/jobs/job-search-service"
+import { resolveJobSearchLocation, resolvePostedWithin } from "@/services/jobs/normalize-job"
 import type { Job } from "@/types/job"
 
 type ApiUser = {
@@ -113,14 +114,16 @@ export async function handleSearchJobsRequest(
     const search = deps.searchAndStoreJobs ?? searchAndStoreJobs
     const result = await search({
       keyword: query.keyword?.trim().slice(0, 120),
-      location: query.location?.trim().slice(0, 120),
+      location: resolveJobSearchLocation(query.location).slice(0, 120),
       jobType: query.jobType?.trim().slice(0, 40),
+      postedWithin: resolvePostedWithin(query.postedWithin),
     })
 
     return NextResponse.json({
       jobs: result.jobs,
       provider: result.provider,
       fetched: result.fetched,
+      warning: result.warning ?? null,
     })
   } catch (error) {
     if (error instanceof JobProviderError) {

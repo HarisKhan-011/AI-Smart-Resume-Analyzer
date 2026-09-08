@@ -4,7 +4,7 @@ import {
   type JobSearchQuery,
   type ProviderJob,
 } from "@/services/jobs/job-provider"
-import { firstNonEmpty, mapEmploymentType, stripHtml } from "@/services/jobs/normalize-job"
+import { firstNonEmpty, mapEmploymentType, matchesJobLocation, stripHtml } from "@/services/jobs/normalize-job"
 
 type RemotiveJob = {
   title?: unknown
@@ -63,16 +63,13 @@ export class RemotiveJobProvider implements JobProvider {
       throw new JobProviderError("The job listings service returned an invalid response.", 502, "INVALID_RESPONSE")
     }
 
-    const locationFilter = query.location?.trim().toLowerCase()
+    const locationFilter = query.location?.trim()
     const jobTypeFilter = query.jobType?.trim()
 
     return payload.jobs
       .map((item) => this.toProviderJob(item as RemotiveJob))
       .filter((job): job is ProviderJob => Boolean(job))
-      .filter((job) => {
-        if (!locationFilter) return true
-        return job.location.toLowerCase().includes(locationFilter)
-      })
+      .filter((job) => matchesJobLocation(job.location, locationFilter))
       .filter((job) => {
         if (!jobTypeFilter || jobTypeFilter === "all") return true
         return job.employmentType === jobTypeFilter

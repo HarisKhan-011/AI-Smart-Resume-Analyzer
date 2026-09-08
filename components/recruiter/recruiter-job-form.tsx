@@ -21,7 +21,7 @@ export function RecruiterJobForm({ job }: { job?: Job }) {
   const router = useRouter()
   const [title, setTitle] = useState(job?.title ?? "")
   const [company, setCompany] = useState(job?.company ?? "")
-  const [location, setLocation] = useState(job?.location ?? "")
+  const [location, setLocation] = useState(job?.location ?? "Pakistan")
   const [employmentType, setEmploymentType] = useState(job?.employmentType ?? "full-time")
   const [description, setDescription] = useState(job?.description ?? "")
   const [requiredSkills, setRequiredSkills] = useState((job?.requiredSkills ?? []).join(", "))
@@ -109,6 +109,7 @@ export function RecruiterJobForm({ job }: { job?: Job }) {
                 onChange={(event) => setLocation(event.target.value)}
                 required
                 minLength={2}
+                placeholder="Lahore, Karachi, Islamabad"
                 disabled={isSaving}
               />
             </div>

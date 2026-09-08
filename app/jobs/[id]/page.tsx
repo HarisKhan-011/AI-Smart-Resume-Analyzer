@@ -67,7 +67,7 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
           icon={Briefcase}
         />
         <div className="flex flex-wrap gap-2 sm:mt-1">
-          <JobApplicationActions jobId={job.id} compact />
+          <JobApplicationActions jobId={job.id} applyUrl={job.sourceUrl} compact />
           <Button asChild>
             <Link href={`/job-match?jobId=${job.id}`}>
               <Search className="h-4 w-4" />

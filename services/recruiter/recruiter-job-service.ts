@@ -59,7 +59,7 @@ function parseJobFields(input: RecruiterJobPayload, partial = false) {
   const parsed = recruiterJobSchema.safeParse({
     title: input.title ?? (partial ? "Placeholder" : ""),
     company: input.company ?? (partial ? "Placeholder" : ""),
-    location: input.location ?? (partial ? "Remote" : ""),
+    location: input.location ?? (partial ? "Pakistan" : ""),
     employmentType: input.employmentType ?? "full-time",
     description: input.description ?? (partial ? "Placeholder description for a recruiter job posting." : ""),
     requiredSkills: Array.isArray(input.requiredSkills)

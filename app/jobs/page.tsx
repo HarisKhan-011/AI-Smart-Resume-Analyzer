@@ -10,6 +10,7 @@ interface JobsPageProps {
     keyword?: string
     location?: string
     jobType?: string
+    posted?: string
   }>
 }
 
@@ -22,7 +23,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <PageHeader
           title="Search Jobs"
-          description="Find live listings, extract skills, and save them for resume matching."
+          description="Find Pakistan listings, extract skills, and save them for resume matching."
           icon={Briefcase}
         />
         <Button asChild variant="outline" className="sm:mt-1">
@@ -37,6 +38,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
         initialKeyword={params.keyword ?? ""}
         initialLocation={params.location ?? ""}
         initialJobType={params.jobType ?? "all"}
+        initialPostedWithin={params.posted ?? "all"}
       />
     </div>
   )

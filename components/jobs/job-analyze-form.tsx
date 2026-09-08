@@ -134,7 +134,7 @@ export function JobAnalyzeForm() {
                 name="location"
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
-                placeholder="Remote"
+                placeholder="Lahore, Karachi, Islamabad"
                 disabled={isAnalyzing}
               />
             </div>

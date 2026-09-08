@@ -2,6 +2,7 @@ import { isValidObjectId } from "mongoose"
 import { dbConnect } from "@/lib/mongodb"
 import { toStringId } from "@/lib/serialize"
 import { Job, type JobDocument } from "@/models/job"
+import { isPakistanJob } from "@/services/jobs/normalize-job"
 import type { EmploymentType, Job as JobDTO, JobSource } from "@/types/job"
 
 export type CreateJobInput = {
@@ -121,7 +122,7 @@ export async function listJobsForRecommendations(
   })
     .sort({ postedDate: -1, createdAt: -1 })
     .limit(limit)
-  return jobs.map(toJobDTO)
+  return jobs.map(toJobDTO).filter((job) => isPakistanJob(job.location))
 }
 
 export async function listPublicJobs(options?: {

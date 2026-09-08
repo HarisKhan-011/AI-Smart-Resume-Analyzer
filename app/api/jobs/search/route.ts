@@ -11,5 +11,6 @@ export async function GET(request: Request) {
     keyword: searchParams.get("keyword") ?? "",
     location: searchParams.get("location") ?? "",
     jobType: searchParams.get("jobType") ?? "",
+    postedWithin: searchParams.get("posted") ?? "",
   })
 }

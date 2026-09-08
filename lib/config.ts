@@ -44,6 +44,13 @@ export const config = {
       relevance: 0.1,
     },
   },
+
+  jobs: {
+    defaultLocation: "Pakistan",
+    locationPlaceholder: "Lahore, Karachi, Islamabad",
+    searchResultLimit: 40,
+    feedCacheTtlMs: 15 * 60 * 1000,
+  },
   
   // Pagination configuration
   pagination: {

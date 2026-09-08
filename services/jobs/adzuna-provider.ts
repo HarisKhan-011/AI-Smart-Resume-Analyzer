@@ -4,7 +4,13 @@ import {
   type JobSearchQuery,
   type ProviderJob,
 } from "@/services/jobs/job-provider"
-import { firstNonEmpty, mapEmploymentType, stripHtml } from "@/services/jobs/normalize-job"
+import {
+  firstNonEmpty,
+  mapEmploymentType,
+  matchesJobLocation,
+  matchesPostedWithin,
+  stripHtml,
+} from "@/services/jobs/normalize-job"
 
 type AdzunaJob = {
   title?: unknown
@@ -23,7 +29,7 @@ export class AdzunaJobProvider implements JobProvider {
   async search(query: JobSearchQuery): Promise<ProviderJob[]> {
     const appId = process.env.ADZUNA_APP_ID?.trim()
     const appKey = process.env.ADZUNA_APP_KEY?.trim()
-    const country = (process.env.ADZUNA_COUNTRY ?? "gb").trim().toLowerCase()
+    const country = (process.env.ADZUNA_COUNTRY ?? "pk").trim().toLowerCase()
 
     if (!appId || !appKey) {
       throw new JobProviderError(
@@ -81,10 +87,12 @@ export class AdzunaJobProvider implements JobProvider {
     return payload.results
       .map((item) => this.toProviderJob(item as AdzunaJob))
       .filter((job): job is ProviderJob => Boolean(job))
+      .filter((job) => matchesJobLocation(job.location, query.location))
       .filter((job) => {
         if (!jobTypeFilter || jobTypeFilter === "all") return true
         return job.employmentType === jobTypeFilter
       })
+      .filter((job) => matchesPostedWithin(job.postedDate, query.postedWithin))
   }
 
   private toProviderJob(item: AdzunaJob): ProviderJob | null {

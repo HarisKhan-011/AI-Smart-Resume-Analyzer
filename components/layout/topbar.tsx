@@ -1,8 +1,9 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import { useRef, useState } from "react"
 import { Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { KeywordSuggestInput } from "@/components/jobs/keyword-suggest-input"
 import { UserMenu } from "./user-menu"
 import { MobileMenuButton } from "./mobile-navigation"
 
@@ -26,6 +27,30 @@ const pageTitles: Record<string, string> = {
   "/admin": "Admin Dashboard",
 }
 
+function TopbarJobSearch() {
+  const [keyword, setKeyword] = useState("")
+  const formRef = useRef<HTMLFormElement>(null)
+
+  return (
+    <form ref={formRef} action="/jobs" method="GET" className="relative hidden md:block">
+      <Search
+        className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+        aria-hidden="true"
+      />
+      <KeywordSuggestInput
+        name="keyword"
+        value={keyword}
+        onChange={setKeyword}
+        onPick={() => formRef.current?.requestSubmit()}
+        placeholder="Search jobs..."
+        className="w-40 pl-10 lg:w-64"
+        ariaLabel="Search jobs"
+      />
+      <input type="hidden" name="location" value="Pakistan" />
+    </form>
+  )
+}
+
 function getPageTitle(pathname: string): string {
   if (pageTitles[pathname]) return pageTitles[pathname]
   if (pathname.startsWith("/resume/")) return "Resume"
@@ -46,28 +71,14 @@ export function Topbar({ title, onMenuClick, showSearch = true }: TopbarProps) {
   const displayTitle = title ?? getPageTitle(pathname)
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-4 overflow-visible border-b bg-background px-4 sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
         {onMenuClick && <MobileMenuButton onClick={onMenuClick} />}
         <h1 className="truncate text-lg font-semibold sm:text-xl">{displayTitle}</h1>
       </div>
 
       <div className="flex min-w-0 items-center gap-2 sm:gap-4">
-        {showSearch && (
-          <form action="/jobs" method="GET" className="relative hidden md:block">
-            <Search
-              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <Input
-              type="search"
-              name="keyword"
-              placeholder="Search jobs..."
-              className="w-40 pl-10 lg:w-64"
-              aria-label="Search jobs"
-            />
-          </form>
-        )}
+        {showSearch && <TopbarJobSearch />}
 
         <UserMenu />
       </div>

@@ -136,7 +136,9 @@ export function JobCard({
             <Link href={checkMatchHref}>Check Match</Link>
           </Button>
         )}
-        {showApplicationActions && id && <JobApplicationActions jobId={id} />}
+        {showApplicationActions && id && (
+          <JobApplicationActions jobId={id} applyUrl={sourceUrl} />
+        )}
       </CardFooter>
     </Card>
   )

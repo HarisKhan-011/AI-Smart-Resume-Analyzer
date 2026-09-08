@@ -64,9 +64,11 @@ export function removeTrackedApplication(jobId: string) {
 
 export function JobApplicationActions({
   jobId,
+  applyUrl = null,
   compact = false,
 }: {
   jobId: string
+  applyUrl?: string | null
   compact?: boolean
 }) {
   const [status, setStatus] = useState<ApplicationStatus | null>(null)
@@ -118,6 +120,13 @@ export function JobApplicationActions({
     [jobId]
   )
 
+  const apply = useCallback(async () => {
+    if (applyUrl) {
+      window.open(applyUrl, "_blank", "noopener,noreferrer")
+    }
+    await track("applied")
+  }, [applyUrl, track])
+
   const isSaved = Boolean(status)
   const isApplied = status != null && status !== "saved"
 
@@ -143,14 +152,14 @@ export function JobApplicationActions({
         size="sm"
         className={compact ? undefined : "flex-1"}
         disabled={Boolean(pending) || isApplied}
-        onClick={() => void track("applied")}
+        onClick={() => void apply()}
       >
         {pending === "applied" ? (
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
         ) : (
           <Send className="h-4 w-4" aria-hidden="true" />
         )}
-        {isApplied ? "Tracking" : "Apply / Track Application"}
+        {isApplied ? "Applied" : applyUrl ? "Apply" : "Track Application"}
       </Button>
       {error && <p className="basis-full text-xs text-destructive">{error}</p>}
     </div>

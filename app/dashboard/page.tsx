@@ -149,7 +149,8 @@ export default async function DashboardPage() {
               <Input
                 id="dashboard-job-location"
                 name="location"
-                placeholder="Remote, London"
+                defaultValue="Pakistan"
+                placeholder="Lahore, Karachi, Islamabad"
               />
             </div>
             <div className="flex items-end">
