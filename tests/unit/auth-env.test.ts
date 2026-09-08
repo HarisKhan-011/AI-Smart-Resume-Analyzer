@@ -22,8 +22,10 @@ describe("database unavailable helpers", () => {
 
   it("explains Vercel Atlas setup instead of local MongoDB", () => {
     process.env.VERCEL = "1"
-    expect(getDatabaseUnavailableMessage()).toMatch(/Vercel/)
-    expect(getDatabaseUnavailableMessage()).toMatch(/0\.0\.0\.0\/0/)
+    expect(getDatabaseUnavailableMessage()).toMatch(/Atlas/)
+    expect(
+      getDatabaseUnavailableMessage(new Error("MONGODB_URI is not set. In Vercel"))
+    ).toMatch(/missing/)
     delete process.env.VERCEL
     expect(getDatabaseUnavailableMessage()).toMatch(/\.env\.local/)
   })

@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     if (isDatabaseUnavailable(error)) {
       return NextResponse.json(
         {
-          error: getDatabaseUnavailableMessage(),
+          error: getDatabaseUnavailableMessage(error),
         },
         { status: 503 }
       )

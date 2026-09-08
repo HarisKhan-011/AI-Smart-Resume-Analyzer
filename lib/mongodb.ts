@@ -1,4 +1,7 @@
+import dns from "node:dns"
 import mongoose from "mongoose"
+
+dns.setDefaultResultOrder("ipv4first")
 
 interface MongooseCache {
   conn: typeof mongoose | null
@@ -16,11 +19,15 @@ const CONNECTION_STATES = {
   3: "disconnecting",
 } as const
 
+function isVercelRuntime(): boolean {
+  return Boolean(process.env.VERCEL)
+}
+
 function getMongoUri() {
-  const uri = process.env.MONGODB_URI
+  const uri = process.env.MONGODB_URI?.trim()
   if (!uri) {
     throw new Error(
-      process.env.VERCEL
+      isVercelRuntime()
         ? "MONGODB_URI is not set. In Vercel → Settings → Environment Variables, add MONGODB_URI for Production, Preview, and Development, then Redeploy."
         : "MONGODB_URI is not set. Add it to .env.local (or .env) and restart the server."
     )
@@ -39,8 +46,9 @@ export async function dbConnect(): Promise<typeof mongoose> {
   if (!cache.promise) {
     cache.promise = mongoose.connect(getMongoUri(), {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 15000,
       maxPoolSize: 5,
+      family: 4,
     })
   }
 
@@ -75,9 +83,13 @@ export function isDatabaseUnavailable(error: unknown): boolean {
   )
 }
 
-export function getDatabaseUnavailableMessage(): string {
-  if (process.env.VERCEL) {
-    return "Cannot connect to MongoDB on Vercel. Add MONGODB_URI in Vercel → Settings → Environment Variables for Production and Preview, then Redeploy. In MongoDB Atlas → Network Access, allow 0.0.0.0/0 so Vercel can connect."
+export function getDatabaseUnavailableMessage(error?: unknown): string {
+  const message = error && typeof error === "object" && "message" in error ? String(error.message) : ""
+  if (isVercelRuntime()) {
+    if (message.includes("MONGODB_URI is not set")) {
+      return "MONGODB_URI is missing on this Vercel deployment. Add it under Settings → Environment Variables for Production and Preview, then Redeploy."
+    }
+    return "Vercel cannot reach MongoDB Atlas. Confirm MONGODB_URI is set for Preview and Production, Redeploy, and in Atlas → Network Access allow 0.0.0.0/0."
   }
   return "Cannot connect to MongoDB. Start MongoDB locally or set MONGODB_URI in .env.local to a MongoDB Atlas connection string."
 }
