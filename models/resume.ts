@@ -1,5 +1,12 @@
 import { Schema, model, models, type Document, type Model, type Types } from "mongoose"
-import type { AnalysisStatus, Education, ExtractedSkill, WorkExperience } from "@/types/resume"
+import type {
+  AnalysisStatus,
+  AtsAnalysisStatus,
+  AtsBreakdown,
+  Education,
+  ExtractedSkill,
+  WorkExperience,
+} from "@/types/resume"
 
 const WorkExperienceSchema = new Schema<WorkExperience>(
   {
@@ -31,6 +38,18 @@ const ExtractedSkillSchema = new Schema<ExtractedSkill>(
   { _id: false }
 )
 
+const AtsBreakdownSchema = new Schema<AtsBreakdown>(
+  {
+    contact: { type: Number, min: 0, max: 100, default: 0 },
+    sections: { type: Number, min: 0, max: 100, default: 0 },
+    keywords: { type: Number, min: 0, max: 100, default: 0 },
+    readability: { type: Number, min: 0, max: 100, default: 0 },
+    experience: { type: Number, min: 0, max: 100, default: 0 },
+    completeness: { type: Number, min: 0, max: 100, default: 0 },
+  },
+  { _id: false }
+)
+
 export interface ResumeDocument extends Document {
   userId: Types.ObjectId
   fileName: string
@@ -42,6 +61,12 @@ export interface ResumeDocument extends Document {
   experience: WorkExperience[]
   education: Education[]
   analysisStatus: AnalysisStatus
+  atsScore?: number | null
+  atsBreakdown?: AtsBreakdown | null
+  atsIssues: string[]
+  atsSuggestions: string[]
+  atsStrengths: string[]
+  atsAnalysisStatus: AtsAnalysisStatus
   createdAt: Date
   updatedAt: Date
 }
@@ -90,6 +115,34 @@ const ResumeSchema = new Schema<ResumeDocument>(
       default: [],
     },
     analysisStatus: {
+      type: String,
+      enum: ["pending", "processing", "completed", "failed"],
+      default: "pending",
+      required: true,
+    },
+    atsScore: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: null,
+    },
+    atsBreakdown: {
+      type: AtsBreakdownSchema,
+      default: null,
+    },
+    atsIssues: {
+      type: [String],
+      default: [],
+    },
+    atsSuggestions: {
+      type: [String],
+      default: [],
+    },
+    atsStrengths: {
+      type: [String],
+      default: [],
+    },
+    atsAnalysisStatus: {
       type: String,
       enum: ["pending", "processing", "completed", "failed"],
       default: "pending",

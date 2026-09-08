@@ -6,6 +6,7 @@ import {
 import { extractResumeText } from "@/lib/resume/extract-text"
 import { resumeFileStorage, type FileStorage } from "@/lib/storage/file-storage"
 import { createResume } from "@/services/resume-service"
+import { analyzeOwnedResume } from "@/services/resume-analysis-service"
 import type { Resume as ResumeDTO } from "@/types/resume"
 
 export type ProcessResumeUploadInput = {
@@ -29,12 +30,14 @@ type UploadDependencies = {
   storage: FileStorage
   saveResume: typeof createResume
   extractText: typeof extractResumeText
+  analyzeResume?: typeof analyzeOwnedResume
 }
 
 const defaultDependencies: UploadDependencies = {
   storage: resumeFileStorage,
   saveResume: createResume,
   extractText: extractResumeText,
+  analyzeResume: analyzeOwnedResume,
 }
 
 export async function processResumeUpload(
@@ -64,16 +67,30 @@ export async function processResumeUpload(
     fileType,
     extractedText,
     analysisStatus: "pending",
+    atsAnalysisStatus: "pending",
   })
 
+  const analyzeResume = deps.analyzeResume ?? analyzeOwnedResume
+  let analyzedResume = resume
+  try {
+    const analyzed = await analyzeResume(resume.id, input.userId)
+    analyzedResume = analyzed.resume
+  } catch (error) {
+    console.error("Automatic resume analysis failed", {
+      resumeId: resume.id,
+      userId: input.userId,
+      error: error instanceof Error ? error.message : "unknown",
+    })
+  }
+
   return {
-    resume,
+    resume: analyzedResume,
     result: {
-      id: resume.id,
-      fileName: resume.fileName,
-      fileType: resume.fileType,
-      analysisStatus: resume.analysisStatus,
-      createdAt: resume.createdAt,
+      id: analyzedResume.id,
+      fileName: analyzedResume.fileName,
+      fileType: analyzedResume.fileType,
+      analysisStatus: analyzedResume.analysisStatus,
+      createdAt: analyzedResume.createdAt,
       textLength: extractedText.length,
     },
   }

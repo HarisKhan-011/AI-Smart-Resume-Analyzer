@@ -160,9 +160,16 @@ export async function handleAnalyzeResumeRequest(
         fileName: result.resume.fileName,
         analysisStatus: result.resume.analysisStatus,
         skills: result.resume.skills,
+        atsScore: result.resume.atsScore ?? null,
+        atsBreakdown: result.resume.atsBreakdown ?? null,
+        atsIssues: result.resume.atsIssues ?? [],
+        atsSuggestions: result.resume.atsSuggestions ?? [],
+        atsStrengths: result.resume.atsStrengths ?? [],
+        atsAnalysisStatus: result.resume.atsAnalysisStatus ?? "pending",
       },
       skills: result.skills,
       skillCount: result.skillCount,
+      ats: result.ats,
     })
   } catch (error) {
     if (error instanceof ResumeAnalysisError) {

@@ -1,5 +1,16 @@
 export type AnalysisStatus = "pending" | "processing" | "completed" | "failed"
 
+export type AtsAnalysisStatus = "pending" | "processing" | "completed" | "failed"
+
+export type AtsBreakdown = {
+  contact: number
+  sections: number
+  keywords: number
+  readability: number
+  experience: number
+  completeness: number
+}
+
 export interface WorkExperience {
   company: string
   position: string
@@ -40,6 +51,12 @@ export interface Resume {
   experience: WorkExperience[]
   education: Education[]
   analysisStatus: AnalysisStatus
+  atsScore?: number | null
+  atsBreakdown?: AtsBreakdown | null
+  atsIssues?: string[]
+  atsSuggestions?: string[]
+  atsStrengths?: string[]
+  atsAnalysisStatus?: AtsAnalysisStatus
   createdAt: Date
   updatedAt: Date
 }

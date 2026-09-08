@@ -36,7 +36,7 @@ export default async function ResumeDetailPage({ params }: ResumeDetailPageProps
     <div className="space-y-6">
       <PageHeader
         title={resume.fileName}
-        description="Extracted text and NLP skill analysis for this resume."
+        description="Extracted text, skills, and an ATS-oriented parser/readability check for this resume."
         icon={FileText}
       />
 
@@ -66,12 +66,29 @@ export default async function ResumeDetailPage({ params }: ResumeDetailPageProps
         <span className="text-sm text-muted-foreground">
           Uploaded {formatDate(resume.createdAt)}
         </span>
+        {resume.atsAnalysisStatus === "completed" && resume.atsScore != null && (
+          <Badge
+            variant={
+              resume.atsScore >= 80 ? "success" : resume.atsScore >= 60 ? "warning" : "destructive"
+            }
+          >
+            ATS {resume.atsScore}/100
+          </Badge>
+        )}
       </div>
 
       <ResumeAnalysisSection
         resumeId={resume.id}
         analysisStatus={resume.analysisStatus}
         initialSkills={extractedSkills}
+        initialAts={{
+          atsScore: resume.atsScore,
+          atsBreakdown: resume.atsBreakdown,
+          atsIssues: resume.atsIssues,
+          atsSuggestions: resume.atsSuggestions,
+          atsStrengths: resume.atsStrengths,
+          atsAnalysisStatus: resume.atsAnalysisStatus,
+        }}
       />
 
       <Card>

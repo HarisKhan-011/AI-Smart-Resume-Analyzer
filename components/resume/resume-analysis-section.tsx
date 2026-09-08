@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SkillBadge } from "@/components/matching/skill-badge"
+import { AtsReport, type AtsReportProps } from "@/components/resume/ats-report"
 import type { AnalysisStatus, ExtractedSkill } from "@/types/resume"
 
 function groupSkillsByCategory(skills: ExtractedSkill[]) {
@@ -27,16 +28,19 @@ type ResumeAnalysisSectionProps = {
   resumeId: string
   analysisStatus: AnalysisStatus
   initialSkills: ExtractedSkill[]
+  initialAts?: AtsReportProps
 }
 
 export function ResumeAnalysisSection({
   resumeId,
   analysisStatus,
   initialSkills,
+  initialAts,
 }: ResumeAnalysisSectionProps) {
   const router = useRouter()
   const [skills, setSkills] = useState(initialSkills)
   const [status, setStatus] = useState(analysisStatus)
+  const [ats, setAts] = useState<AtsReportProps>(initialAts ?? {})
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -44,7 +48,8 @@ export function ResumeAnalysisSection({
   useEffect(() => {
     setSkills(initialSkills)
     setStatus(analysisStatus)
-  }, [analysisStatus, initialSkills])
+    setAts(initialAts ?? {})
+  }, [analysisStatus, initialAts, initialSkills])
 
   async function analyzeResume() {
     setIsAnalyzing(true)
@@ -60,6 +65,7 @@ export function ResumeAnalysisSection({
         error?: string
         skills?: ExtractedSkill[]
         skillCount?: number
+        resume?: AtsReportProps & { analysisStatus?: AnalysisStatus }
       }
 
       if (!response.ok) {
@@ -69,10 +75,18 @@ export function ResumeAnalysisSection({
       const nextSkills = body.skills ?? []
       setSkills(nextSkills)
       setStatus("completed")
+      setAts({
+        atsScore: body.resume?.atsScore ?? null,
+        atsBreakdown: body.resume?.atsBreakdown ?? null,
+        atsIssues: body.resume?.atsIssues ?? [],
+        atsSuggestions: body.resume?.atsSuggestions ?? [],
+        atsStrengths: body.resume?.atsStrengths ?? [],
+        atsAnalysisStatus: body.resume?.atsAnalysisStatus ?? "pending",
+      })
       setSuccess(
         nextSkills.length
-          ? `Analysis complete. ${nextSkills.length} skill${nextSkills.length === 1 ? "" : "s"} detected.`
-          : "Analysis complete. No listed skills were detected in this resume."
+          ? `Analysis complete. ${nextSkills.length} skill${nextSkills.length === 1 ? "" : "s"} detected and ATS score updated.`
+          : "Analysis complete. No listed skills were detected. ATS score was still updated from the extracted text."
       )
       router.refresh()
     } catch (analyzeError) {
@@ -91,7 +105,7 @@ export function ResumeAnalysisSection({
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          Detect skills from the extracted resume text, then use Job Match to compare with a job.
+          Skills and an ATS-oriented score are generated from the extracted resume text. Re-run analysis after you upload a new version.
         </p>
         <Button type="button" onClick={analyzeResume} disabled={isAnalyzing}>
           {isAnalyzing ? (
@@ -142,7 +156,7 @@ export function ResumeAnalysisSection({
             <p className="text-sm text-muted-foreground">
               {status === "failed"
                 ? "Analysis did not complete. Try again."
-                : "No skills detected yet. Click Analyze Resume to extract skills."}
+                : "No skills detected yet. Upload a resume or click Analyze Resume to extract skills."}
             </p>
           ) : (
             <div className="space-y-6">
@@ -160,6 +174,8 @@ export function ResumeAnalysisSection({
           )}
         </CardContent>
       </Card>
+
+      <AtsReport {...ats} />
     </div>
   )
 }

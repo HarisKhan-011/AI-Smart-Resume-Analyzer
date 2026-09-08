@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals"
 import { ResumeUploadError, type ResumeFileType } from "@/lib/resume/file-validation"
 import { processResumeUpload } from "@/services/resume-upload-service"
+import type { AnalyzeResumeResult } from "@/services/resume-analysis-service"
 import type { CreateResumeInput } from "@/services/resume-service"
 import type { Resume } from "@/types/resume"
 
@@ -10,7 +11,7 @@ const docxBuffer = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x14, 0x00])
 const extracted =
   "Jane Candidate\nSoftware Engineer\nBuilt web applications with React and Node.js."
 
-function mockResume(fileType: "pdf" | "docx"): Resume {
+function mockResume(fileType: "pdf" | "docx", overrides: Partial<Resume> = {}): Resume {
   return {
     id: "507f1f77bcf86cd799439011",
     userId: "507f1f77bcf86cd799439012",
@@ -25,6 +26,20 @@ function mockResume(fileType: "pdf" | "docx"): Resume {
     analysisStatus: "pending",
     createdAt: new Date("2026-08-31"),
     updatedAt: new Date("2026-08-31"),
+    ...overrides,
+  }
+}
+
+function analyzedResult(fileType: "pdf" | "docx"): AnalyzeResumeResult {
+  return {
+    resume: mockResume(fileType, {
+      analysisStatus: "completed",
+      atsScore: 72,
+      atsAnalysisStatus: "completed",
+    }),
+    skills: [],
+    skillCount: 0,
+    ats: null,
   }
 }
 
@@ -36,13 +51,16 @@ describe("resume upload processing", () => {
   const storage = {
     save: jest.fn(async () => ({ key: "resumes/user/file", url: "local://resumes/user/file" })),
   }
+  const analyzeResume = jest.fn(async (): Promise<AnalyzeResumeResult> => analyzedResult("pdf"))
 
   beforeEach(() => {
     saveResume.mockReset()
     extractText.mockReset()
+    analyzeResume.mockReset()
     storage.save.mockClear()
     saveResume.mockResolvedValue(mockResume("pdf"))
     extractText.mockResolvedValue(extracted)
+    analyzeResume.mockResolvedValue(analyzedResult("pdf"))
   })
 
   it("saves a pending resume document after a successful PDF upload", async () => {
@@ -56,7 +74,7 @@ describe("resume upload processing", () => {
         size: pdfBuffer.length,
         buffer: pdfBuffer,
       },
-      { storage, saveResume, extractText }
+      { storage, saveResume, extractText, analyzeResume }
     )
 
     expect(extractText).toHaveBeenCalledWith(pdfBuffer, "pdf")
@@ -70,12 +88,14 @@ describe("resume upload processing", () => {
         analysisStatus: "pending",
       })
     )
+    expect(analyzeResume).toHaveBeenCalledWith("507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012")
     expect(result.id).toBe("507f1f77bcf86cd799439011")
-    expect(result.analysisStatus).toBe("pending")
+    expect(result.analysisStatus).toBe("completed")
   })
 
   it("uploads a DOCX and saves extracted text", async () => {
     saveResume.mockResolvedValue(mockResume("docx"))
+    analyzeResume.mockResolvedValue(analyzedResult("docx"))
 
     await processResumeUpload(
       {
@@ -86,7 +106,7 @@ describe("resume upload processing", () => {
         size: docxBuffer.length,
         buffer: docxBuffer,
       },
-      { storage, saveResume, extractText }
+      { storage, saveResume, extractText, analyzeResume }
     )
 
     expect(extractText).toHaveBeenCalledWith(docxBuffer, "docx")
@@ -139,5 +159,23 @@ describe("resume upload processing", () => {
 
     expect(extractText).not.toHaveBeenCalled()
     expect(saveResume).not.toHaveBeenCalled()
+  })
+
+  it("still saves the resume if automatic ATS analysis fails", async () => {
+    analyzeResume.mockRejectedValue(new Error("ats unavailable"))
+
+    const { result } = await processResumeUpload(
+      {
+        userId: "507f1f77bcf86cd799439012",
+        fileName: "resume.pdf",
+        mimeType: "application/pdf",
+        size: pdfBuffer.length,
+        buffer: pdfBuffer,
+      },
+      { storage, saveResume, extractText, analyzeResume }
+    )
+
+    expect(saveResume).toHaveBeenCalledTimes(1)
+    expect(result.analysisStatus).toBe("pending")
   })
 })

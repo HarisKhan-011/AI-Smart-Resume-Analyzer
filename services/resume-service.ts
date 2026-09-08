@@ -4,6 +4,8 @@ import { toStringId } from "@/lib/serialize"
 import { Resume, type ResumeDocument } from "@/models/resume"
 import type {
   AnalysisStatus,
+  AtsAnalysisStatus,
+  AtsBreakdown,
   Education,
   ExtractedSkill,
   Resume as ResumeDTO,
@@ -23,6 +25,12 @@ export type CreateResumeInput = {
   experience?: WorkExperience[]
   education?: Education[]
   analysisStatus?: AnalysisStatus
+  atsScore?: number | null
+  atsBreakdown?: AtsBreakdown | null
+  atsIssues?: string[]
+  atsSuggestions?: string[]
+  atsStrengths?: string[]
+  atsAnalysisStatus?: AtsAnalysisStatus
 }
 
 export type UpdateResumeInput = Partial<
@@ -50,6 +58,21 @@ function toResumeDTO(resume: ResumeDocument, includeText = false): ResumeDTO {
     experience: resume.experience ?? [],
     education: resume.education ?? [],
     analysisStatus: resume.analysisStatus,
+    atsScore: resume.atsScore ?? null,
+    atsBreakdown: resume.atsBreakdown
+      ? {
+          contact: resume.atsBreakdown.contact ?? 0,
+          sections: resume.atsBreakdown.sections ?? 0,
+          keywords: resume.atsBreakdown.keywords ?? 0,
+          readability: resume.atsBreakdown.readability ?? 0,
+          experience: resume.atsBreakdown.experience ?? 0,
+          completeness: resume.atsBreakdown.completeness ?? 0,
+        }
+      : null,
+    atsIssues: resume.atsIssues ?? [],
+    atsSuggestions: resume.atsSuggestions ?? [],
+    atsStrengths: resume.atsStrengths ?? [],
+    atsAnalysisStatus: resume.atsAnalysisStatus ?? "pending",
     createdAt: resume.createdAt,
     updatedAt: resume.updatedAt,
   }
@@ -74,6 +97,12 @@ export async function createResume(input: CreateResumeInput): Promise<ResumeDTO>
     experience: input.experience ?? [],
     education: input.education ?? [],
     analysisStatus: input.analysisStatus ?? "pending",
+    atsScore: input.atsScore ?? null,
+    atsBreakdown: input.atsBreakdown ?? null,
+    atsIssues: input.atsIssues ?? [],
+    atsSuggestions: input.atsSuggestions ?? [],
+    atsStrengths: input.atsStrengths ?? [],
+    atsAnalysisStatus: input.atsAnalysisStatus ?? "pending",
   })
   return toResumeDTO(resume, true)
 }

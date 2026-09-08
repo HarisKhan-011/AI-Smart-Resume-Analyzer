@@ -111,10 +111,13 @@ export function ResumeUploadForm() {
           <AlertTitle>Resume uploaded</AlertTitle>
           <AlertDescription>
             <span className="block">
-              {uploaded.fileName} ({uploaded.fileType.toUpperCase()}) was saved. Analysis status: pending.
+              {uploaded.fileName} ({uploaded.fileType.toUpperCase()}) was saved.
+              {uploaded.analysisStatus === "completed"
+                ? " Text extraction, skill detection, and ATS analysis finished automatically."
+                : ` Analysis status: ${uploaded.analysisStatus}.`}
             </span>
             <Button asChild variant="link" className="h-auto px-0">
-              <Link href={`/resume/${uploaded.id}`}>View extracted text</Link>
+              <Link href={`/resume/${uploaded.id}`}>View ATS score and extracted text</Link>
             </Button>
           </AlertDescription>
         </Alert>
@@ -189,7 +192,9 @@ export function ResumeUploadForm() {
         <div className="space-y-2">
           <Progress value={progress} aria-label="Upload progress" />
           <p className="text-sm text-muted-foreground">
-            {progress < 80 ? "Uploading file..." : "Extracting text and saving..."}
+            {progress < 80
+              ? "Uploading file..."
+              : "Extracting text, detecting skills, and running ATS analysis..."}
           </p>
         </div>
       )}
