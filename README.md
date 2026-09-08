@@ -87,15 +87,17 @@ Never put secrets in source files. `.env*.local` is gitignored.
 
 The `/api/auth/error` "Server error" page means Auth.js is missing production settings.
 
-In Vercel → Project → Settings → Environment Variables, add these for Production (and Preview):
+In Vercel → Project → Settings → Environment Variables, add these for **Production, Preview, and Development**:
 
 | Variable | Value |
 | --- | --- |
-| `MONGODB_URI` | Your MongoDB Atlas connection string (allow Vercel IPs or `0.0.0.0/0`) |
+| `MONGODB_URI` | Your MongoDB Atlas connection string |
 | `AUTH_SECRET` | A long random string (`openssl rand -base64 32`) |
 | `AUTH_URL` | `https://your-app.vercel.app` — **not** `http://localhost:3000` |
 
-Then **Redeploy**. Do not copy `AUTH_URL=http://localhost:3000` from `.env.example` into Vercel.
+Then **Redeploy**. Preview URLs (`*-projects.vercel.app`) only receive env vars if Preview is checked.
+
+In Atlas → Network Access, add `0.0.0.0/0` so Vercel serverless IPs can connect. In Atlas → Database Access, the user in the URI must have read/write on the database.
 
 ## How to run
 

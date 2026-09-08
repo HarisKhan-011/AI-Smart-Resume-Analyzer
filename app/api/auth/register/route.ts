@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { isDatabaseUnavailable } from "@/lib/mongodb"
+import { getDatabaseUnavailableMessage, isDatabaseUnavailable } from "@/lib/mongodb"
 import { registerSchema } from "@/lib/validations"
 import { createUser, userExistsByEmail } from "@/services/user-service"
 
@@ -46,8 +46,7 @@ export async function POST(request: Request) {
     if (isDatabaseUnavailable(error)) {
       return NextResponse.json(
         {
-          error:
-            "Cannot connect to MongoDB. Start MongoDB locally or set MONGODB_URI in .env.local to a MongoDB Atlas connection string.",
+          error: getDatabaseUnavailableMessage(),
         },
         { status: 503 }
       )

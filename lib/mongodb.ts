@@ -20,7 +20,9 @@ function getMongoUri() {
   const uri = process.env.MONGODB_URI
   if (!uri) {
     throw new Error(
-      "MONGODB_URI is not set. Add it to .env.local (or .env) and restart the server."
+      process.env.VERCEL
+        ? "MONGODB_URI is not set. In Vercel → Settings → Environment Variables, add MONGODB_URI for Production, Preview, and Development, then Redeploy."
+        : "MONGODB_URI is not set. Add it to .env.local (or .env) and restart the server."
     )
   }
   return uri
@@ -38,6 +40,7 @@ export async function dbConnect(): Promise<typeof mongoose> {
     cache.promise = mongoose.connect(getMongoUri(), {
       bufferCommands: false,
       serverSelectionTimeoutMS: 10000,
+      maxPoolSize: 5,
     })
   }
 
@@ -57,10 +60,26 @@ export function isDatabaseUnavailable(error: unknown): boolean {
   const message = "message" in error ? String(error.message) : ""
   return (
     name === "MongooseServerSelectionError" ||
+    name === "MongoServerSelectionError" ||
+    name === "MongoNetworkError" ||
+    name === "MongoTimeoutError" ||
     message.includes("ECONNREFUSED") ||
+    message.includes("ENOTFOUND") ||
+    message.includes("ETIMEDOUT") ||
+    message.includes("querySrv") ||
     message.includes("MongoServerSelectionError") ||
-    message.includes("MONGODB_URI is not set")
+    message.includes("MONGODB_URI is not set") ||
+    message.includes("whitelist") ||
+    message.includes("Could not connect to any servers") ||
+    /authentication failed/i.test(message)
   )
+}
+
+export function getDatabaseUnavailableMessage(): string {
+  if (process.env.VERCEL) {
+    return "Cannot connect to MongoDB on Vercel. Add MONGODB_URI in Vercel → Settings → Environment Variables for Production and Preview, then Redeploy. In MongoDB Atlas → Network Access, allow 0.0.0.0/0 so Vercel can connect."
+  }
+  return "Cannot connect to MongoDB. Start MongoDB locally or set MONGODB_URI in .env.local to a MongoDB Atlas connection string."
 }
 
 export function getConnectionStateLabel(readyState: number): string {

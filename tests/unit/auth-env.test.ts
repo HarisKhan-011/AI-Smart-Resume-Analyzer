@@ -1,5 +1,33 @@
-import { describe, expect, it } from "@jest/globals"
+import { afterEach, describe, expect, it } from "@jest/globals"
 import { resolveAuthUrl } from "@/lib/auth-env"
+import {
+  getDatabaseUnavailableMessage,
+  isDatabaseUnavailable,
+} from "@/lib/mongodb"
+
+describe("database unavailable helpers", () => {
+  const originalVercel = process.env.VERCEL
+
+  afterEach(() => {
+    if (originalVercel === undefined) delete process.env.VERCEL
+    else process.env.VERCEL = originalVercel
+  })
+
+  it("detects Atlas and missing-URI failures", () => {
+    expect(isDatabaseUnavailable({ name: "MongooseServerSelectionError", message: "failed" })).toBe(true)
+    expect(isDatabaseUnavailable(new Error("MONGODB_URI is not set. Add it to .env.local"))).toBe(true)
+    expect(isDatabaseUnavailable(new Error("querySrv ENOTFOUND"))).toBe(true)
+    expect(isDatabaseUnavailable(new Error("bad input"))).toBe(false)
+  })
+
+  it("explains Vercel Atlas setup instead of local MongoDB", () => {
+    process.env.VERCEL = "1"
+    expect(getDatabaseUnavailableMessage()).toMatch(/Vercel/)
+    expect(getDatabaseUnavailableMessage()).toMatch(/0\.0\.0\.0\/0/)
+    delete process.env.VERCEL
+    expect(getDatabaseUnavailableMessage()).toMatch(/\.env\.local/)
+  })
+})
 
 describe("auth production URL", () => {
   it("replaces localhost AUTH_URL with the Vercel https host", () => {
