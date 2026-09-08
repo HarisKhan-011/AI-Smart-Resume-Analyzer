@@ -83,6 +83,20 @@ npm run ai:embed
 
 Never put secrets in source files. `.env*.local` is gitignored.
 
+## Deploy on Vercel
+
+The `/api/auth/error` "Server error" page means Auth.js is missing production settings.
+
+In Vercel → Project → Settings → Environment Variables, add these for Production (and Preview):
+
+| Variable | Value |
+| --- | --- |
+| `MONGODB_URI` | Your MongoDB Atlas connection string (allow Vercel IPs or `0.0.0.0/0`) |
+| `AUTH_SECRET` | A long random string (`openssl rand -base64 32`) |
+| `AUTH_URL` | `https://your-app.vercel.app` — **not** `http://localhost:3000` |
+
+Then **Redeploy**. Do not copy `AUTH_URL=http://localhost:3000` from `.env.example` into Vercel.
+
 ## How to run
 
 ```bash

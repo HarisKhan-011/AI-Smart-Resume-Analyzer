@@ -1,9 +1,12 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { authConfig } from "@/auth.config"
+import { applyAuthEnv } from "@/lib/auth-env"
 import { verifyPassword } from "@/lib/password"
 import { loginSchema } from "@/lib/validations"
 import { findUserForAuth } from "@/services/user-service"
+
+applyAuthEnv()
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,

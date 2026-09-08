@@ -18,12 +18,17 @@ type FieldErrors = Partial<Record<"email" | "password", string>>
 export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const errorParam = searchParams.get("error")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-  const [error, setError] = useState<string | null>(
-    searchParams.get("error") ? "Invalid email or password." : null
-  )
+  const [error, setError] = useState<string | null>(() => {
+    if (!errorParam) return null
+    if (errorParam === "Configuration") {
+      return "Authentication is not configured on this server. In Vercel → Settings → Environment Variables, add AUTH_SECRET and MONGODB_URI. Set AUTH_URL to this site's https address (not localhost), then Redeploy."
+    }
+    return "Invalid email or password."
+  })
   const [isLoading, setIsLoading] = useState(false)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

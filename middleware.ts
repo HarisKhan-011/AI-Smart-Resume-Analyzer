@@ -5,6 +5,9 @@ import { authConfig } from "@/auth.config"
 // Next.js Edge middleware only inlines env vars referenced in this file.
 void process.env.AUTH_SECRET
 void process.env.NEXTAUTH_SECRET
+void process.env.AUTH_URL
+void process.env.NEXTAUTH_URL
+void process.env.VERCEL_URL
 import {
   canAccessAdminRoutes,
   canAccessRecruiterRoutes,

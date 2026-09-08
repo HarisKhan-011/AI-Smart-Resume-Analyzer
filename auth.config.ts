@@ -1,5 +1,8 @@
 import type { NextAuthConfig } from "next-auth"
 import type { UserRole } from "@/types/user"
+import { applyAuthEnv } from "@/lib/auth-env"
+
+applyAuthEnv()
 
 export const authConfig = {
   trustHost: true,
@@ -10,6 +13,7 @@ export const authConfig = {
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   providers: [],
   callbacks: {
