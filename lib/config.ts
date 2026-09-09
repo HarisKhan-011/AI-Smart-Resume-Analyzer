@@ -51,6 +51,16 @@ export const config = {
     searchResultLimit: 40,
     feedCacheTtlMs: 15 * 60 * 1000,
   },
+
+  chat: {
+    maxMessageLength: 2000,
+    maxStoredMessages: 40,
+    llmHistoryMessages: 12,
+    resumeExcerptChars: 2500,
+    matchLimit: 5,
+    recommendationLimit: 5,
+    timeoutMs: 30_000,
+  },
   
   // Pagination configuration
   pagination: {

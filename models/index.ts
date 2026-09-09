@@ -15,3 +15,6 @@ export type { SkillDocument } from "@/models/skill"
 
 export { Application } from "@/models/application"
 export type { ApplicationDocument } from "@/models/application"
+
+export { ChatConversation } from "@/models/chat-conversation"
+export type { ChatConversationDocument } from "@/models/chat-conversation"

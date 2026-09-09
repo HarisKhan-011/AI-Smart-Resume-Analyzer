@@ -15,7 +15,7 @@ import { getRecruiterCandidateDetail } from "@/services/recruiter/recruiter-cand
 
 describe("route protection helpers", () => {
   it("marks candidate and recruiter app paths as protected", () => {
-    expect(isProtectedPath("/dashboard")).toBe(true)
+    expect(isProtectedPath("/resume-improve")).toBe(true)
     expect(isProtectedPath("/resume/upload")).toBe(true)
     expect(isProtectedPath("/recruiter/jobs")).toBe(true)
     expect(isProtectedPath("/admin")).toBe(true)
