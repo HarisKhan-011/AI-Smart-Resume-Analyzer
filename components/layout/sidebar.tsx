@@ -21,6 +21,7 @@ import {
   MessageCircle,
   Wand2,
   GraduationCap,
+  Route,
   LucideIcon,
 } from "lucide-react"
 
@@ -37,6 +38,7 @@ export const candidateNavItems: NavItem[] = [
   { href: "/jobs", label: "Jobs", icon: Briefcase },
   { href: "/recommendations", label: "Recommended Jobs", icon: Sparkles },
   { href: "/skill-gap", label: "Skill Gap", icon: TrendingUp },
+  { href: "/career-roadmap", label: "Career Roadmap", icon: Route },
   { href: "/applications", label: "Applications", icon: ClipboardList },
   { href: "/career-assistant", label: "Career Assistant", icon: MessageCircle },
   { href: "/resume-improve", label: "Resume Improve", icon: Wand2 },
@@ -75,6 +77,7 @@ const exactMatchHrefs = new Set([
   "/career-assistant",
   "/resume-improve",
   "/interview-prep",
+  "/career-roadmap",
   "/recruiter/jobs/new",
 ])
 

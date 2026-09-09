@@ -19,6 +19,7 @@ const pageTitles: Record<string, string> = {
   "/career-assistant": "Career Assistant",
   "/resume-improve": "Resume Improve",
   "/interview-prep": "Interview Prep",
+  "/career-roadmap": "Career Roadmap",
   "/profile": "Profile",
   "/jobs": "Jobs",
   "/recruiter": "Recruiter Dashboard",
