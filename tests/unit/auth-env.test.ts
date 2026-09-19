@@ -1,9 +1,25 @@
 import { afterEach, describe, expect, it } from "@jest/globals"
 import { resolveAuthUrl } from "@/lib/auth-env"
+import { readMongoUri } from "@/lib/mongo-uri"
 import {
   getDatabaseUnavailableMessage,
   isDatabaseUnavailable,
 } from "@/lib/mongodb"
+
+describe("mongo uri reader", () => {
+  it("reads MONGODB_URI at runtime and strips wrapping quotes", () => {
+    expect(readMongoUri({ MONGODB_URI: '  "mongodb+srv://user:pass@cluster.mongodb.net/app"  ' })).toBe(
+      "mongodb+srv://user:pass@cluster.mongodb.net/app"
+    )
+  })
+
+  it("accepts common aliases so a misnamed Vercel variable still works", () => {
+    expect(readMongoUri({ DATABASE_URL: "mongodb+srv://user:pass@cluster.mongodb.net/app" })).toContain(
+      "mongodb+srv://"
+    )
+    expect(readMongoUri({})).toBe("")
+  })
+})
 
 describe("database unavailable helpers", () => {
   const originalVercel = process.env.VERCEL

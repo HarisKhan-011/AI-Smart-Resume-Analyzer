@@ -1,5 +1,6 @@
 import dns from "node:dns"
 import mongoose from "mongoose"
+import { readMongoUri } from "@/lib/mongo-uri"
 
 dns.setDefaultResultOrder("ipv4first")
 
@@ -24,7 +25,7 @@ function isVercelRuntime(): boolean {
 }
 
 function getMongoUri() {
-  const uri = process.env.MONGODB_URI?.trim()
+  const uri = readMongoUri()
   if (!uri) {
     throw new Error(
       isVercelRuntime()

@@ -3,6 +3,9 @@ import { getDatabaseUnavailableMessage, isDatabaseUnavailable } from "@/lib/mong
 import { registerSchema } from "@/lib/validations"
 import { createUser, userExistsByEmail } from "@/services/user-service"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export async function POST(request: Request) {
   try {
     const body: unknown = await request.json()
