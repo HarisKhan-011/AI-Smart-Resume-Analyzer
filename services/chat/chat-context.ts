@@ -6,8 +6,6 @@ import { Job } from "@/models/job"
 import { getLearningSuggestions } from "@/lib/learning-suggestions"
 import { listResumesByUser, getOwnedResume, type ResumeSummary } from "@/services/resume-service"
 import { listMatchesByUser } from "@/services/match-service"
-import { listOwnedApplicationsWithJobs } from "@/services/applications/application-service"
-import { recommendJobsForUser, RecommendationError } from "@/services/recommendations/recommendation-service"
 import type { CareerChatContext } from "@/types/chat"
 import type { Resume } from "@/types/resume"
 
@@ -32,8 +30,6 @@ type ChatContextDependencies = {
   listResumesByUser: typeof listResumesByUser
   getOwnedResume: typeof getOwnedResume
   listMatchesByUser: typeof listMatchesByUser
-  listOwnedApplicationsWithJobs: typeof listOwnedApplicationsWithJobs
-  recommendJobsForUser: typeof recommendJobsForUser
   loadJobLabels: (jobIds: string[]) => Promise<Map<string, JobLabel>>
 }
 
@@ -41,8 +37,6 @@ const defaultDependencies: ChatContextDependencies = {
   listResumesByUser,
   getOwnedResume,
   listMatchesByUser,
-  listOwnedApplicationsWithJobs,
-  recommendJobsForUser,
   loadJobLabels,
 }
 
@@ -108,10 +102,9 @@ export async function buildCareerChatContext(
 ): Promise<CareerChatContext> {
   const missingDataNotes: string[] = []
 
-  const [resumes, matches, applications] = await Promise.all([
+  const [resumes, matches] = await Promise.all([
     deps.listResumesByUser(userId),
     deps.listMatchesByUser(userId),
-    deps.listOwnedApplicationsWithJobs(userId),
   ])
 
   const selected = pickResume(resumes)
@@ -152,55 +145,10 @@ export async function buildCareerChatContext(
     missingDataNotes.push("The user has no saved job match results.")
   }
 
-  let recommendedJobs: CareerChatContext["recommendedJobs"] = []
-  if (!selected) {
-    missingDataNotes.push("No job recommendations are available yet.")
-  } else {
-    try {
-      const ranked = await deps.recommendJobsForUser(userId, selected.id)
-      recommendedJobs = ranked.recommendations.slice(0, config.chat.recommendationLimit).map((item) => ({
-        title: item.job.title,
-        company: item.job.company,
-        location: item.job.location,
-        overallScore: item.overallScore,
-        matchedSkills: item.matchedSkills,
-        missingSkills: item.missingSkills,
-      }))
-    } catch (error) {
-      if (!(error instanceof RecommendationError)) {
-        console.error("Career chat recommendations failed", {
-          userId,
-          error: error instanceof Error ? error.message : "unknown",
-        })
-      }
-      missingDataNotes.push("Job recommendations could not be loaded from the user's current resume.")
-    }
-    if (
-      recommendedJobs.length === 0 &&
-      !missingDataNotes.includes("Job recommendations could not be loaded from the user's current resume.")
-    ) {
-      missingDataNotes.push("No job recommendations are available yet.")
-    }
-  }
-
-  const missingSkills = [...new Set([
-    ...jobMatches.flatMap((match) => match.missingSkills),
-    ...recommendedJobs.flatMap((item) => item.missingSkills),
-  ])].slice(0, 12)
+  const missingSkills = [...new Set(jobMatches.flatMap((match) => match.missingSkills))].slice(0, 12)
 
   if (missingSkills.length === 0) {
-    missingDataNotes.push("No skill-gap data is available from matches or recommendations.")
-  }
-
-  const applicationContext = applications.slice(0, 12).map((item) => ({
-    status: item.status,
-    jobTitle: item.job?.title ?? null,
-    company: item.job?.company ?? null,
-    matchScore: item.matchScore,
-    notes: item.notes?.trim() ? item.notes.trim().slice(0, 280) : "",
-  }))
-  if (applicationContext.length === 0) {
-    missingDataNotes.push("The user has no tracked job applications.")
+    missingDataNotes.push("No skill-gap data is available from saved role matches.")
   }
 
   return {
@@ -215,8 +163,8 @@ export async function buildCareerChatContext(
       missingSkills,
       learningSuggestions: getLearningSuggestions(missingSkills).slice(0, 8),
     },
-    applications: applicationContext,
-    recommendedJobs,
+    applications: [],
+    recommendedJobs: [],
   }
 }
 

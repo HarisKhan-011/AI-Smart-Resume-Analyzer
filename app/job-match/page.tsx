@@ -1,10 +1,8 @@
-import Link from "next/link"
 import { requireAuth } from "@/lib/auth-utils"
 import { listResumesByUser } from "@/services/resume-service"
 import { getAccessibleJob, listAccessibleJobs } from "@/services/job-service"
 import { JobMatchWorkspace } from "@/components/matching/job-match-workspace"
 import { PageHeader } from "@/components/shared/page-header"
-import { Button } from "@/components/ui/button"
 import { Search } from "lucide-react"
 
 interface JobMatchPageProps {
@@ -27,16 +25,11 @@ export default async function JobMatchPage({ searchParams }: JobMatchPageProps) 
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <PageHeader
-          title="Job Match"
-          description="Compare an analyzed resume with a job using skill match and semantic similarity."
-          icon={Search}
-        />
-        <Button asChild variant="outline" className="sm:mt-1">
-          <Link href="/jobs">View jobs</Link>
-        </Button>
-      </div>
+      <PageHeader
+        title="Job Match"
+        description="Compare an analyzed resume with a job description using skill match and semantic similarity."
+        icon={Search}
+      />
       <JobMatchWorkspace
         initialJobId={selectedJobId}
         resumes={resumes.map((resume) => ({

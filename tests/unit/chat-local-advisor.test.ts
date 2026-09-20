@@ -76,4 +76,10 @@ describe("career chat local advisor", () => {
     expect(reply).toMatch(/do not have a resume/i)
     expect(reply).toContain("The user has not uploaded a resume.")
   })
+
+  it("refuses questions that are not about resume, career, jobs, CV, or roadmap", () => {
+    const reply = adviseFromCareerContext(context, "Write me a poem about cricket")
+    expect(reply).toMatch(/can't answer any irrelevant questions/i)
+    expect(reply).not.toContain("78/100")
+  })
 })

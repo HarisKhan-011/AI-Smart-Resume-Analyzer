@@ -73,13 +73,38 @@ export const loginSchema = z.object({
     .max(72, "Password is too long"),
 })
 
+const GARBAGE_NAME =
+  /^(test|user|admin|asdf|qwerty|abc|xyz|name|fullname|dummy|foo|bar|lorem|ipsum|sample|fake)(\s+(test|user|admin|asdf|qwerty|abc|xyz|name|dummy|foo|bar|lorem|ipsum|sample|fake))*$/i
+
+function isRealFullName(value: string): boolean {
+  const parts = value.split(/\s+/).filter(Boolean)
+  if (parts.length < 2) return false
+  if (GARBAGE_NAME.test(value)) return false
+  if (/(.)\1{3,}/.test(value)) return false
+  return parts.every((part) => /^[A-Za-z][A-Za-z.'-]*[A-Za-z]$|^[A-Za-z]{2,}$/.test(part) && part.replace(/[^A-Za-z]/g, "").length >= 2)
+}
+
+function isRealPhone(value: string): boolean {
+  const digits = value.replace(/\D/g, "")
+  if (digits.length < 10 || digits.length > 15) return false
+  if (/^(\d)\1+$/.test(digits)) return false
+  if (/^1234567890/.test(digits) || /^0123456789/.test(digits)) return false
+  return /^[+0-9()\-\s]+$/.test(value)
+}
+
 export const registerSchema = z
   .object({
     name: z
       .string({ required_error: "Full name is required" })
       .trim()
       .min(2, "Full name must be at least 2 characters")
-      .max(80, "Full name must be 80 characters or less"),
+      .max(80, "Full name must be 80 characters or less")
+      .refine(isRealFullName, "Enter your real first and last name"),
+    phone: z
+      .string({ required_error: "Phone number is required" })
+      .trim()
+      .min(1, "Phone number is required")
+      .refine(isRealPhone, "Enter a valid phone number"),
     email: z
       .string({ required_error: "Email is required" })
       .trim()
@@ -94,10 +119,7 @@ export const registerSchema = z
     confirmPassword: z
       .string({ required_error: "Confirm your password" })
       .min(1, "Confirm your password"),
-    role: z.enum(["candidate", "recruiter"], {
-      required_error: "Select a role",
-      invalid_type_error: "Role must be candidate or recruiter",
-    }),
+    role: z.literal("candidate").optional().default("candidate"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -106,6 +128,39 @@ export const registerSchema = z
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>
+
+export const profileUpdateSchema = z.object({
+  name: z
+    .string({ required_error: "Full name is required" })
+    .trim()
+    .min(2, "Full name must be at least 2 characters")
+    .max(80, "Full name must be 80 characters or less"),
+  phone: z
+    .string()
+    .trim()
+    .max(30, "Phone number must be 30 characters or less")
+    .refine((value) => value === "" || /^[+0-9()\-\s]{7,30}$/.test(value), {
+      message: "Enter a valid phone number",
+    })
+    .optional()
+    .default(""),
+  title: z.string().trim().max(120, "Headline must be 120 characters or less").optional().default(""),
+  location: z.string().trim().max(120, "Location must be 120 characters or less").optional().default(""),
+  bio: z.string().trim().max(500, "Bio must be 500 characters or less").optional().default(""),
+  image: z
+    .string()
+    .nullable()
+    .optional()
+    .refine(
+      (value) =>
+        value == null ||
+        value === "" ||
+        (value.startsWith("data:image/") && value.length <= 400_000),
+      "Profile photo must be a small image (JPG, PNG, or WebP)."
+    ),
+})
+
+export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>
 
 export const MIN_JOB_DESCRIPTION_LENGTH = 50
 

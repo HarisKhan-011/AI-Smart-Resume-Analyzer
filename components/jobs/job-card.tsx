@@ -38,7 +38,7 @@ export function JobCard({
   postedAt,
   href = "#",
   checkMatchHref,
-  showApplicationActions = true,
+  showApplicationActions = false,
   requiredSkillCount,
   missingSkills = [],
 }: JobCardProps) {

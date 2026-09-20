@@ -79,7 +79,7 @@ export function LoginForm() {
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+    <form className="space-y-3" onSubmit={handleSubmit} noValidate>
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>

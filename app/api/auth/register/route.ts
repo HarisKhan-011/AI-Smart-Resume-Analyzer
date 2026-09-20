@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { name, email, password, role } = parsed.data
+    const { name, email, password, phone } = parsed.data
 
     if (await userExistsByEmail(email)) {
       return NextResponse.json(
@@ -30,7 +30,13 @@ export async function POST(request: Request) {
       )
     }
 
-    const user = await createUser({ name, email, password, role })
+    const user = await createUser({
+      name,
+      email,
+      password,
+      phone,
+      role: "candidate",
+    })
     return NextResponse.json({ user }, { status: 201 })
   } catch (error) {
     if (

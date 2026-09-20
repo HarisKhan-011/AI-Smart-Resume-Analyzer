@@ -2,7 +2,7 @@ export const USER_ROLE_VALUES = ["candidate", "recruiter", "admin"] as const
 
 export type UserRole = (typeof USER_ROLE_VALUES)[number]
 
-export const PUBLIC_REGISTER_ROLES = ["candidate", "recruiter"] as const
+export const PUBLIC_REGISTER_ROLES = ["candidate"] as const
 export type PublicRegisterRole = (typeof PUBLIC_REGISTER_ROLES)[number]
 
 export interface User {
@@ -11,6 +11,10 @@ export interface User {
   name: string
   role: UserRole
   image?: string | null
+  phone?: string
+  title?: string
+  location?: string
+  bio?: string
   createdAt: Date
   updatedAt: Date
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { LogoutButton } from "@/components/auth/logout-button"
@@ -10,25 +10,94 @@ import { getPostLoginPath } from "@/lib/auth-paths"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const navLinks = [
-  { href: "/#features", label: "Features" },
-  { href: "/#how-it-works", label: "How It Works" },
-  { href: "/#for-candidates", label: "For Candidates" },
-  { href: "/#for-recruiters", label: "For Recruiters" },
-]
+const SECTION_LINKS = [
+  { id: "features", href: "/#features", label: "Features" },
+  { id: "how-it-works", href: "/#how-it-works", label: "How It Works" },
+  { id: "for-candidates", href: "/#for-candidates", label: "For Candidates" },
+  { id: "for-recruiters", href: "/#for-recruiters", label: "For Recruiters" },
+] as const
 
-export function LandingNavbar() {
+const SECTION_IDS = ["home", ...SECTION_LINKS.map((item) => item.id)] as const
+
+function navClass(active: boolean) {
+  return cn(
+    "text-sm font-medium transition-colors hover:text-primary",
+    active ? "text-primary" : "text-muted-foreground"
+  )
+}
+
+function sectionFromHash(hash: string): string {
+  const id = hash.replace("#", "")
+  return SECTION_IDS.includes(id as (typeof SECTION_IDS)[number]) ? id : "home"
+}
+
+export function LandingNavbar({ compact = false }: { compact?: boolean }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState<string>("home")
+  const lockedSection = useRef<string | null>(null)
   const pathname = usePathname()
   const { data: session, status } = useSession()
   const dashboardHref = getPostLoginPath(session?.user?.role)
+  const onHome = pathname === "/"
+
+  useEffect(() => {
+    if (!onHome) {
+      setActiveSection("home")
+      return
+    }
+
+    const applyHash = () => {
+      setActiveSection(sectionFromHash(window.location.hash))
+    }
+    applyHash()
+    window.addEventListener("hashchange", applyHash)
+
+    const elements = SECTION_IDS.map((id) => document.getElementById(id)).filter(
+      (node): node is HTMLElement => Boolean(node)
+    )
+    if (elements.length === 0) {
+      return () => window.removeEventListener("hashchange", applyHash)
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (lockedSection.current) {
+          const locked = entries.find((entry) => entry.target.id === lockedSection.current && entry.isIntersecting)
+          if (locked) lockedSection.current = null
+          else return
+        }
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+        if (visible[0]?.target.id) {
+          setActiveSection(visible[0].target.id)
+        }
+      },
+      { rootMargin: "-18% 0px -72% 0px", threshold: [0.1, 0.25, 0.5, 0.75] }
+    )
+
+    elements.forEach((el) => observer.observe(el))
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("hashchange", applyHash)
+    }
+  }, [onHome])
+
+  function activateSection(id: string) {
+    lockedSection.current = id
+    setActiveSection(id)
+    setMobileOpen(false)
+  }
+
+  const homeActive = onHome && activeSection === "home"
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className={cn("container mx-auto flex items-center justify-between px-4", compact ? "h-14" : "h-16")}>
         <Link
-          href="/"
+          href="/#home"
           className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          onClick={() => activateSection("home")}
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <span className="text-sm font-bold text-primary-foreground">R</span>
@@ -36,26 +105,23 @@ export function LandingNavbar() {
           <span className="text-lg font-semibold">ResumeAI</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Main navigation">
-          <Link
-            href="/"
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary",
-              pathname === "/" ? "text-primary" : "text-muted-foreground"
-            )}
-          >
-            Home
-          </Link>
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {link.label}
+        {!compact && (
+          <nav className="hidden items-center gap-6 md:flex" aria-label="Main navigation">
+            <Link href="/#home" className={navClass(homeActive)} onClick={() => activateSection("home")}>
+              Home
             </Link>
-          ))}
-        </nav>
+            {SECTION_LINKS.map((link) => (
+              <Link
+                key={link.id}
+                href={link.href}
+                className={navClass(onHome && activeSection === link.id)}
+                onClick={() => activateSection(link.id)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        )}
 
         <div className="hidden items-center gap-3 md:flex">
           {status === "loading" ? (
@@ -69,7 +135,7 @@ export function LandingNavbar() {
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
+              <Button variant={pathname === "/login" ? "secondary" : "ghost"} asChild>
                 <Link href="/login">Login</Link>
               </Button>
               <Button asChild>
@@ -92,24 +158,31 @@ export function LandingNavbar() {
       {mobileOpen && (
         <nav className="border-t px-4 py-4 md:hidden" aria-label="Mobile navigation">
           <div className="flex flex-col gap-2">
-            <Link
-              href="/"
-              className="rounded-md px-3 py-2 text-sm font-medium hover:bg-accent"
-              onClick={() => setMobileOpen(false)}
-            >
-              Home
-            </Link>
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="mt-2 flex flex-col gap-2 border-t pt-4">
+            {!compact && (
+              <>
+                <Link
+                  href="/#home"
+                  className={cn("rounded-md px-3 py-2 text-sm font-medium hover:bg-accent", homeActive && "text-primary")}
+                  onClick={() => activateSection("home")}
+                >
+                  Home
+                </Link>
+                {SECTION_LINKS.map((link) => (
+                  <Link
+                    key={link.id}
+                    href={link.href}
+                    className={cn(
+                      "rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
+                      onHome && activeSection === link.id ? "text-primary" : "text-muted-foreground"
+                    )}
+                    onClick={() => activateSection(link.id)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </>
+            )}
+            <div className={cn("flex flex-col gap-2", !compact && "mt-2 border-t pt-4")}>
               {session?.user ? (
                 <>
                   <Button asChild>

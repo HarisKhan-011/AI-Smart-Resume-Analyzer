@@ -11,13 +11,11 @@ import {
   Search,
   Briefcase,
   TrendingUp,
-  ClipboardList,
   User,
   Settings,
   Users,
   BarChart3,
   Shield,
-  Sparkles,
   MessageCircle,
   Wand2,
   GraduationCap,
@@ -35,11 +33,8 @@ export const candidateNavItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/resume", label: "My Resumes", icon: FileText },
   { href: "/job-match", label: "Job Match", icon: Search },
-  { href: "/jobs", label: "Jobs", icon: Briefcase },
-  { href: "/recommendations", label: "Recommended Jobs", icon: Sparkles },
   { href: "/skill-gap", label: "Skill Gap", icon: TrendingUp },
   { href: "/career-roadmap", label: "Career Roadmap", icon: Route },
-  { href: "/applications", label: "Applications", icon: ClipboardList },
   { href: "/career-assistant", label: "Career Assistant", icon: MessageCircle },
   { href: "/resume-improve", label: "Resume Improve", icon: Wand2 },
   { href: "/interview-prep", label: "Interview Prep", icon: GraduationCap },
@@ -128,15 +123,22 @@ interface SidebarFooterProps {
 }
 
 export function SidebarFooter({ onNavigate, collapsed = false }: SidebarFooterProps) {
+  const pathname = usePathname()
+  const settingsActive = pathname === "/settings"
+
   return (
     <div className="border-t p-4">
       <Link
         href="/settings"
         onClick={onNavigate}
         className={cn(
-          "flex items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          collapsed ? "justify-center" : "space-x-3"
+          "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          collapsed ? "justify-center" : "space-x-3",
+          settingsActive
+            ? "bg-primary text-primary-foreground"
+            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
         )}
+        aria-current={settingsActive ? "page" : undefined}
         title={collapsed ? "Settings" : undefined}
       >
         <Settings className="h-5 w-5 shrink-0" aria-hidden="true" />

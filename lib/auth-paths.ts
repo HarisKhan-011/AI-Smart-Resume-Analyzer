@@ -24,6 +24,16 @@ export function isAuthPage(pathname: string): boolean {
   return AUTH_PAGES.some((page) => pathname === page || pathname.startsWith(`${page}/`))
 }
 
+export function isCandidateJobBoardPath(pathname: string): boolean {
+  return (
+    pathname === "/jobs" ||
+    pathname === "/recommendations" ||
+    pathname.startsWith("/recommendations/") ||
+    pathname === "/applications" ||
+    pathname.startsWith("/applications/")
+  )
+}
+
 export function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)

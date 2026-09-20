@@ -5,10 +5,11 @@ import {
   getPostLoginPath,
   isAdminPath,
   isAuthPage,
+  isCandidateJobBoardPath,
   isProtectedPath,
   isRecruiterPath,
 } from "@/lib/auth-paths"
-import { registerSchema } from "@/lib/validations"
+import { registerSchema, profileUpdateSchema } from "@/lib/validations"
 import { toPublicUser, type UserDocument } from "@/models/user"
 import { RecruiterError } from "@/services/recruiter/recruiter-job-service"
 import { getRecruiterCandidateDetail } from "@/services/recruiter/recruiter-candidate-service"
@@ -23,6 +24,14 @@ describe("route protection helpers", () => {
     expect(isProtectedPath("/admin")).toBe(true)
     expect(isProtectedPath("/")).toBe(false)
     expect(isProtectedPath("/login")).toBe(false)
+  })
+
+  it("treats job board listing routes as candidate job-board paths", () => {
+    expect(isCandidateJobBoardPath("/jobs")).toBe(true)
+    expect(isCandidateJobBoardPath("/recommendations")).toBe(true)
+    expect(isCandidateJobBoardPath("/applications")).toBe(true)
+    expect(isCandidateJobBoardPath("/jobs/abc")).toBe(false)
+    expect(isCandidateJobBoardPath("/job-match")).toBe(false)
   })
 
   it("identifies recruiter and admin routes", () => {
@@ -54,12 +63,46 @@ describe("registration and user DTO safety", () => {
   it("rejects admin as a public registration role", () => {
     const parsed = registerSchema.safeParse({
       name: "Pat Admin",
+      phone: "+92 300 1234567",
       email: "pat@example.com",
       password: "password12",
       confirmPassword: "password12",
       role: "admin",
     })
     expect(parsed.success).toBe(false)
+  })
+
+  it("rejects recruiter as a public registration role", () => {
+    const parsed = registerSchema.safeParse({
+      name: "Pat Recruiter",
+      phone: "+92 300 1234567",
+      email: "pat@example.com",
+      password: "password12",
+      confirmPassword: "password12",
+      role: "recruiter",
+    })
+    expect(parsed.success).toBe(false)
+  })
+
+  it("requires a real name and phone number", () => {
+    expect(
+      registerSchema.safeParse({
+        name: "asdf asdf",
+        phone: "0000000000",
+        email: "pat@example.com",
+        password: "password12",
+        confirmPassword: "password12",
+      }).success
+    ).toBe(false)
+    expect(
+      registerSchema.safeParse({
+        name: "Alex Rahman",
+        phone: "+92 300 1234567",
+        email: "alex@example.com",
+        password: "password12",
+        confirmPassword: "password12",
+      }).success
+    ).toBe(true)
   })
 
   it("omits passwordHash from the public user DTO", () => {
@@ -77,6 +120,18 @@ describe("registration and user DTO safety", () => {
     expect(dto).not.toHaveProperty("passwordHash")
     expect(JSON.stringify(dto)).not.toContain("should-not-leak")
     expect(dto.email).toBe("alex@example.com")
+  })
+
+  it("accepts a valid profile update payload", () => {
+    const parsed = profileUpdateSchema.safeParse({
+      name: "Alex Candidate",
+      phone: "+92 300 1234567",
+      title: "Frontend developer",
+      location: "Lahore",
+      bio: "Builds web apps.",
+      image: null,
+    })
+    expect(parsed.success).toBe(true)
   })
 })
 

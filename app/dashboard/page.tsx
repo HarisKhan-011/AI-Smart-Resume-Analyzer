@@ -12,7 +12,7 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <PageHeader
         title="Career Dashboard"
-        description="Live ATS, match, skill, and application stats from your saved ResumeAI data."
+        description="Live ATS, match, and skill stats from your saved ResumeAI data."
         icon={LayoutDashboard}
       />
       <CareerIntelligenceDashboard data={data} />

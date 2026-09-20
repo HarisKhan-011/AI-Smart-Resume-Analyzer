@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SkillBadge } from "@/components/matching/skill-badge"
 import { formatDate } from "@/lib/utils"
-import { JobApplicationActions } from "@/components/applications/job-application-actions"
 import { Briefcase, ExternalLink, Search } from "lucide-react"
 
 interface JobDetailPageProps {
@@ -67,7 +66,6 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
           icon={Briefcase}
         />
         <div className="flex flex-wrap gap-2 sm:mt-1">
-          <JobApplicationActions jobId={job.id} applyUrl={job.sourceUrl} compact />
           <Button asChild>
             <Link href={`/job-match?jobId=${job.id}`}>
               <Search className="h-4 w-4" />
@@ -75,7 +73,7 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
             </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/jobs">Back to jobs</Link>
+            <Link href="/job-match">Back to Job Match</Link>
           </Button>
         </div>
       </div>

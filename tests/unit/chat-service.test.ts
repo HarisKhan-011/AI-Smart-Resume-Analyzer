@@ -96,7 +96,39 @@ describe("career chat service", () => {
       }
     )
 
-    expect(result.reply.content).toMatch(/no tracked applications/i)
+    expect(result.reply.content).toMatch(/does not track job applications/i)
     expect(result.conversation.messages).toHaveLength(2)
+  })
+
+  it("refuses irrelevant questions without calling career data or the model", async () => {
+    const conversation: ChatConversation = {
+      id: "507f1f77bcf86cd799439077",
+      userId,
+      messages: [],
+      createdAt: new Date("2026-09-01"),
+      updatedAt: new Date("2026-09-01"),
+    }
+    const completeChat = jest.fn(async () => "should not run")
+    const buildCareerChatContext = jest.fn(async () => emptyContext)
+    const saveMessages = jest.fn(async (_id: string, messages: ChatMessage[]) => ({
+      ...conversation,
+      messages,
+    }))
+
+    const result = await sendOwnedChatMessage(
+      userId,
+      "What is the weather in Lahore today?",
+      { name: "Jane", role: "candidate" },
+      {
+        getOwnedChatConversation: jest.fn(async () => conversation),
+        buildCareerChatContext,
+        completeChat,
+        saveMessages,
+      }
+    )
+
+    expect(buildCareerChatContext).not.toHaveBeenCalled()
+    expect(completeChat).not.toHaveBeenCalled()
+    expect(result.reply.content).toMatch(/can't answer any irrelevant questions/i)
   })
 })

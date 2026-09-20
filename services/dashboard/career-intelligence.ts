@@ -4,15 +4,7 @@ import { toStringId } from "@/lib/serialize"
 import { Job } from "@/models/job"
 import { listResumesByUser, type ResumeSummary } from "@/services/resume-service"
 import { listMatchesByUser } from "@/services/match-service"
-import { countOwnedApplicationsByStatus } from "@/services/applications/application-service"
-import {
-  APPLICATION_STATUS_ORDER,
-  emptyApplicationCounts,
-} from "@/services/applications/status"
-import {
-  recommendJobsForUser,
-  RecommendationError,
-} from "@/services/recommendations/recommendation-service"
+import { emptyApplicationCounts } from "@/services/applications/status"
 import type { CareerIntelligenceSnapshot, CareerMatchSummary } from "@/types/career-intelligence"
 
 type JobLabel = {
@@ -23,16 +15,12 @@ type JobLabel = {
 type CareerIntelligenceDependencies = {
   listResumesByUser: typeof listResumesByUser
   listMatchesByUser: typeof listMatchesByUser
-  countOwnedApplicationsByStatus: typeof countOwnedApplicationsByStatus
-  recommendJobsForUser: typeof recommendJobsForUser
   loadJobLabels: (jobIds: string[]) => Promise<Map<string, JobLabel>>
 }
 
 const defaultDependencies: CareerIntelligenceDependencies = {
   listResumesByUser,
   listMatchesByUser,
-  countOwnedApplicationsByStatus,
-  recommendJobsForUser,
   loadJobLabels,
 }
 
@@ -77,29 +65,12 @@ export async function loadCareerIntelligence(
   userId: string,
   deps: CareerIntelligenceDependencies = defaultDependencies
 ): Promise<CareerIntelligenceSnapshot> {
-  const [resumes, matches, applicationCounts] = await Promise.all([
+  const [resumes, matches] = await Promise.all([
     deps.listResumesByUser(userId),
     deps.listMatchesByUser(userId),
-    deps.countOwnedApplicationsByStatus(userId).catch(() => emptyApplicationCounts()),
   ])
 
   const primary = pickPrimaryResume(resumes)
-  let recommendedJobs: CareerIntelligenceSnapshot["recommendedJobs"] = []
-  if (primary?.skills.length) {
-    try {
-      const ranked = await deps.recommendJobsForUser(userId, primary.id)
-      recommendedJobs = ranked.recommendations
-    } catch (error) {
-      if (!(error instanceof RecommendationError)) {
-        console.error("Dashboard recommendations failed", {
-          userId,
-          error: error instanceof Error ? error.message : "unknown",
-        })
-      }
-      recommendedJobs = []
-    }
-  }
-
   const topMatches = matches.slice(0, 8)
   const jobLabels = await deps.loadJobLabels(topMatches.map((match) => match.jobId))
   const persistedMatches: CareerMatchSummary[] = topMatches.map((match) => {
@@ -116,14 +87,8 @@ export async function loadCareerIntelligence(
   })
 
   const bestMatch = persistedMatches[0]
-  const bestRecommendation = recommendedJobs[0]
   const atsReady =
     primary?.atsAnalysisStatus === "completed" && typeof primary.atsScore === "number"
-
-  const applicationTotal = APPLICATION_STATUS_ORDER.reduce(
-    (sum, status) => sum + applicationCounts[status],
-    0
-  )
 
   return {
     resumeCount: resumes.length,
@@ -152,19 +117,14 @@ export async function loadCareerIntelligence(
       createdAt: resume.createdAt,
     })),
     atsScore: atsReady && primary ? (primary.atsScore ?? null) : null,
-    jobMatchScore: bestMatch?.overallScore ?? bestRecommendation?.overallScore ?? null,
-    jobMatchLabel:
-      bestMatch?.jobTitle ??
-      (bestRecommendation ? `${bestRecommendation.job.title} at ${bestRecommendation.job.company}` : null),
-    skillCoverage: bestMatch?.skillScore ?? bestRecommendation?.skillScore ?? null,
+    jobMatchScore: bestMatch?.overallScore ?? null,
+    jobMatchLabel: bestMatch?.jobTitle ?? null,
+    skillCoverage: bestMatch?.skillScore ?? null,
     currentSkills: unique(primary?.skills ?? []).slice(0, 16),
-    missingSkills: unique([
-      ...persistedMatches.flatMap((match) => match.missingSkills),
-      ...recommendedJobs.flatMap((item) => item.missingSkills),
-    ]).slice(0, 16),
-    applicationCounts,
-    applicationTotal,
-    recommendedJobs,
+    missingSkills: unique(persistedMatches.flatMap((match) => match.missingSkills)).slice(0, 16),
+    applicationCounts: emptyApplicationCounts(),
+    applicationTotal: 0,
+    recommendedJobs: [],
     persistedMatches,
   }
 }

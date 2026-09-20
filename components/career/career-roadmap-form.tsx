@@ -86,10 +86,11 @@ export function CareerRoadmapForm({
       <Card>
         <CardContent className="space-y-3 p-6 text-sm text-muted-foreground">
           <p>
-            Add or browse a job first so the roadmap has a real target role.{" "}
-            <Link href="/jobs" className="font-medium text-primary underline-offset-4 hover:underline">
-              Find jobs
-            </Link>
+            Analyze a job description in{" "}
+            <Link href="/job-match" className="font-medium text-primary underline-offset-4 hover:underline">
+              Job Match
+            </Link>{" "}
+            first so the roadmap has a real target role.
           </p>
         </CardContent>
       </Card>

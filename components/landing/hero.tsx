@@ -5,7 +5,7 @@ import { FileText, Brain, Briefcase, ArrowRight } from "lucide-react"
 
 export function HeroSection() {
   return (
-    <section className="container mx-auto px-4 py-16 sm:py-24">
+    <section id="home" className="container mx-auto px-4 py-16 sm:py-24">
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div className="animate-fade-in">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
@@ -13,15 +13,15 @@ export function HeroSection() {
             <span className="block text-primary">& Smart Job Matching</span>
           </h1>
           <p className="mt-6 text-lg text-muted-foreground sm:text-xl">
-            Analyze your resume, discover your skills, compare yourself with job
-            descriptions, identify skill gaps, and find relevant job opportunities.
+            Analyze your resume, extract skills, score ATS readiness, and match
+            against a target job description — without browsing a job board.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" asChild>
               <Link href="/resume/upload">Analyze My Resume</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="/jobs">Explore Jobs</Link>
+              <Link href="/job-match">Match a Role</Link>
             </Button>
           </div>
         </div>

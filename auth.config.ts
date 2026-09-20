@@ -17,10 +17,17 @@ export const authConfig = {
   },
   providers: [],
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
         token.role = user.role
+        token.name = user.name
+        token.picture = user.image
+      }
+      if (trigger === "update" && session && typeof session === "object") {
+        const next = session as { name?: string; image?: string | null }
+        if (typeof next.name === "string") token.name = next.name
+        if ("image" in next) token.picture = next.image
       }
       return token
     },
@@ -28,6 +35,8 @@ export const authConfig = {
       if (session.user) {
         session.user.id = (token.id as string) ?? ""
         session.user.role = (token.role as UserRole) ?? "candidate"
+        if (typeof token.name === "string") session.user.name = token.name
+        if (token.picture !== undefined) session.user.image = (token.picture as string | null) ?? null
       }
       return session
     },

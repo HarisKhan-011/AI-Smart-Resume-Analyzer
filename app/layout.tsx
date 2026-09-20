@@ -12,7 +12,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "ResumeAI — Smart Resume Analyzer & Job Matcher",
   description:
-    "AI-powered resume analysis, job matching, skill gap analysis and job recommendations.",
+    "AI-powered resume analysis, job matching, and skill gap analysis.",
 }
 
 export default async function RootLayout({

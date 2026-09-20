@@ -31,8 +31,8 @@ const features = [
   },
   {
     icon: Lightbulb,
-    title: "Job Recommendations",
-    description: "Receive personalized job suggestions based on your skills and career goals.",
+    title: "Resume Improvement",
+    description: "Get grounded rewrites of summary, experience, and skills without inventing facts.",
   },
   {
     icon: Users,
@@ -47,7 +47,7 @@ export function FeaturesSection() {
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Features</h2>
         <p className="mt-4 text-muted-foreground">
-          Everything you need to optimize your resume and find the right job match.
+          Everything you need to analyze a resume and match it to a target role.
         </p>
       </div>
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

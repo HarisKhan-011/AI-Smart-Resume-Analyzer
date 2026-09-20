@@ -17,7 +17,7 @@ const SUGGESTIONS = [
   "How ATS-friendly is my current resume?",
   "Which skills should I learn next?",
   "How do my job matches look?",
-  "What should I do with my applications?",
+  "What should I improve first?",
 ]
 
 function toSafeDate(value: Date | string | number | null | undefined): Date {
@@ -152,7 +152,7 @@ export function CareerChat({ initialMessages }: CareerChatProps) {
       <CardContent className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            Answers use only your resume, skills, ATS results, job matches, skill gaps, and applications.
+            Answers use only your resume, skills, ATS results, job matches, and skill gaps.
           </p>
           <Button
             type="button"
@@ -242,7 +242,7 @@ export function CareerChat({ initialMessages }: CareerChatProps) {
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Ask a follow-up about your resume, ATS score, matches, or applications..."
+            placeholder="Ask a follow-up about your resume, ATS score, matches, or skill gaps..."
             className="min-h-[88px] resize-none"
             maxLength={2000}
             disabled={isSending}

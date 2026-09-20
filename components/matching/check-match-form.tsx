@@ -134,13 +134,7 @@ export function CheckMatchForm({
             </p>
           )}
           {jobs.length === 0 && (
-            <p>
-              Analyze a job description or{" "}
-              <Link href="/jobs" className="font-medium text-primary underline-offset-4 hover:underline">
-                search online jobs
-              </Link>
-              .
-            </p>
+            <p>Analyze a job description in the Analyze Job tab, then compare it with your resume.</p>
           )}
         </CardContent>
       </Card>

@@ -4,10 +4,10 @@ import { CheckCircle2 } from "lucide-react"
 
 const candidatePoints = [
   "Upload resume",
-  "Analyze skills",
-  "Compare jobs",
+  "Analyze skills and ATS score",
+  "Match against a job description",
   "Find missing skills",
-  "Track applications",
+  "Improve resume and interview prep",
 ]
 
 export function ForCandidatesSection() {
@@ -17,7 +17,7 @@ export function ForCandidatesSection() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">For Candidates</h2>
           <p className="mt-4 text-muted-foreground">
-            Take control of your job search with AI-powered resume analysis and smart matching.
+            Take control of your resume with AI analysis and honest role matching.
           </p>
           <ul className="mt-8 space-y-3">
             {candidatePoints.map((point) => (
@@ -42,7 +42,7 @@ export function ForCandidatesSection() {
               <p className="text-3xl font-bold text-muted-foreground">--</p>
             </div>
             <div className="rounded-lg bg-background p-4 shadow-sm">
-              <p className="text-sm font-medium">Jobs Matched</p>
+              <p className="text-sm font-medium">Role match</p>
               <p className="text-3xl font-bold text-muted-foreground">--</p>
             </div>
           </div>

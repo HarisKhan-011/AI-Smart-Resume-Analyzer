@@ -14,6 +14,7 @@ import {
   getPostLoginPath,
   isAdminPath,
   isAuthPage,
+  isCandidateJobBoardPath,
   isProtectedPath,
   isRecruiterPath,
 } from "@/lib/auth-paths"
@@ -34,6 +35,10 @@ export default auth((req) => {
     const loginUrl = new URL("/login", nextUrl)
     loginUrl.searchParams.set("callbackUrl", pathname)
     return NextResponse.redirect(loginUrl)
+  }
+
+  if (isLoggedIn && isCandidateJobBoardPath(pathname) && role !== "recruiter" && role !== "admin") {
+    return NextResponse.redirect(new URL("/job-match", nextUrl))
   }
 
   if (isRecruiterPath(pathname) && isLoggedIn && !canAccessRecruiterRoutes(role)) {

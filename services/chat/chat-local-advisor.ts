@@ -1,4 +1,5 @@
 import type { CareerChatContext } from "@/types/chat"
+import { IRRELEVANT_CHAT_REPLY, isCareerAssistantTopic } from "@/services/chat/career-topic"
 
 function jobLabel(title: string | null | undefined, company: string | null | undefined): string {
   if (title && company) return `${title} at ${company}`
@@ -58,7 +59,7 @@ function skillAdvice(context: CareerChatContext): string {
     lines.push(`Skills on your resume: ${listItems(skills, 8)}.`)
   }
   if (missing.length) {
-    lines.push(`Missing skills from your saved matches or recommendations: ${listItems(missing, 8)}.`)
+    lines.push(`Missing skills from your saved role matches: ${listItems(missing, 8)}.`)
   }
   if (suggestions.length) {
     lines.push(
@@ -72,35 +73,23 @@ function skillAdvice(context: CareerChatContext): string {
 }
 
 function matchAdvice(context: CareerChatContext): string {
-  if (context.jobMatches.length === 0 && context.recommendedJobs.length === 0) {
-    return "I do not have job match or recommendation results yet. Run Job Match or open Recommended Jobs, then ask again."
+  if (context.jobMatches.length === 0) {
+    return "I do not have job match results yet. Analyze a job description in Job Match, then ask again."
   }
 
-  const lines: string[] = []
-  if (context.jobMatches.length) {
-    const top = context.jobMatches[0]
-    lines.push(
-      `Your strongest saved match is ${jobLabel(top.jobTitle, top.company)} at ${top.overallScore}/100 (${top.skillScore}/100 skill score).`
-    )
-    if (top.missingSkills.length) {
-      lines.push(`That match is missing: ${listItems(top.missingSkills)}.`)
-    }
-  }
-  if (context.recommendedJobs.length) {
-    const top = context.recommendedJobs[0]
-    lines.push(
-      `Top recommendation: ${top.title} at ${top.company} (${top.overallScore}/100).`
-    )
-    if (top.missingSkills.length) {
-      lines.push(`To improve that recommendation, add: ${listItems(top.missingSkills)}.`)
-    }
+  const top = context.jobMatches[0]
+  const lines = [
+    `Your strongest saved match is ${jobLabel(top.jobTitle, top.company)} at ${top.overallScore}/100 (${top.skillScore}/100 skill score).`,
+  ]
+  if (top.missingSkills.length) {
+    lines.push(`That match is missing: ${listItems(top.missingSkills)}.`)
   }
   return lines.join("\n\n")
 }
 
 function applicationAdvice(context: CareerChatContext): string {
   if (context.applications.length === 0) {
-    return "You have no tracked applications yet. Open Applications, save or apply to a job, then I can advise from that list."
+    return "This product does not track job applications. Use Job Match to compare your resume with a target role instead of browsing or saving listings."
   }
 
   const byStatus = new Map<string, number>()
@@ -152,6 +141,10 @@ function overviewAdvice(context: CareerChatContext): string {
  * Used when no LLM API key is configured. Never invents jobs, scores, or skills.
  */
 export function adviseFromCareerContext(context: CareerChatContext, question: string): string {
+  if (!isCareerAssistantTopic(question)) {
+    return IRRELEVANT_CHAT_REPLY
+  }
+
   const text = question.toLowerCase()
   let answer: string
 

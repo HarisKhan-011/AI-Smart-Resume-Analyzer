@@ -7,6 +7,10 @@ export interface UserDocument extends Document {
   passwordHash: string
   role: UserRole
   image?: string | null
+  phone?: string
+  title?: string
+  location?: string
+  bio?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -17,6 +21,10 @@ export interface PublicUserDTO {
   email: string
   role: UserRole
   image: string | null
+  phone: string
+  title: string
+  location: string
+  bio: string
   createdAt: Date
   updatedAt: Date
 }
@@ -53,6 +61,30 @@ const UserSchema = new Schema<UserDocument>(
       type: String,
       default: null,
     },
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 30,
+    },
+    title: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 120,
+    },
+    location: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 120,
+    },
+    bio: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 500,
+    },
   },
   {
     timestamps: true,
@@ -81,6 +113,10 @@ export function toPublicUser(user: UserDocument): PublicUserDTO {
     email: user.email,
     role: user.role,
     image: user.image ?? null,
+    phone: user.phone ?? "",
+    title: user.title ?? "",
+    location: user.location ?? "",
+    bio: user.bio ?? "",
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   }

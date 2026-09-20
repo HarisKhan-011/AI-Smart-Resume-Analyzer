@@ -5,7 +5,7 @@ const values = [
   { icon: Brain, title: "AI Resume Analysis", description: "Intelligent parsing and skill extraction from your resume" },
   { icon: Search, title: "Smart Job Matching", description: "Compare your profile against job descriptions automatically" },
   { icon: TrendingUp, title: "Skill Gap Detection", description: "Identify missing skills and areas for improvement" },
-  { icon: Briefcase, title: "Job Recommendations", description: "Discover relevant opportunities based on your profile" },
+  { icon: Briefcase, title: "Career Tools", description: "Improve your resume, close skill gaps, and prepare for interviews" },
 ]
 
 export function TrustSection() {
