@@ -63,20 +63,47 @@ export async function dbConnect(): Promise<typeof mongoose> {
   }
 }
 
+function getErrorName(error: unknown): string {
+  return error && typeof error === "object" && "name" in error ? String(error.name) : ""
+}
+
+function getErrorMessage(error: unknown): string {
+  return error && typeof error === "object" && "message" in error ? String(error.message) : ""
+}
+
+export function isDuplicateKeyError(error: unknown): boolean {
+  if (!error || typeof error !== "object" || !("code" in error)) return false
+  return error.code === 11000 || error.code === "11000"
+}
+
+export function isMongooseValidationError(error: unknown): boolean {
+  return getErrorName(error) === "ValidationError"
+}
+
 export function isDatabaseUnavailable(error: unknown): boolean {
   if (!error || typeof error !== "object") return false
-  const name = "name" in error ? String(error.name) : ""
-  const message = "message" in error ? String(error.message) : ""
+  const name = getErrorName(error)
+  const message = getErrorMessage(error)
+  if (
+    name === "ValidationError" ||
+    name === "CastError" ||
+    name === "ZodError" ||
+    name === "OverwriteModelError" ||
+    name === "StrictModeError"
+  ) {
+    return false
+  }
+  if (name.startsWith("Mongo") || name.startsWith("Mongoose")) return true
   return (
-    name === "MongooseServerSelectionError" ||
-    name === "MongoServerSelectionError" ||
-    name === "MongoNetworkError" ||
-    name === "MongoTimeoutError" ||
     message.includes("ECONNREFUSED") ||
     message.includes("ENOTFOUND") ||
     message.includes("ETIMEDOUT") ||
+    message.includes("ENETUNREACH") ||
+    message.includes("EHOSTUNREACH") ||
+    message.includes("EAI_AGAIN") ||
     message.includes("querySrv") ||
-    message.includes("MongoServerSelectionError") ||
+    message.includes("queryTxt") ||
+    message.includes("ReplicaSetNoPrimary") ||
     message.includes("MONGODB_URI is not set") ||
     message.includes("whitelist") ||
     message.includes("Could not connect to any servers") ||
@@ -85,10 +112,17 @@ export function isDatabaseUnavailable(error: unknown): boolean {
 }
 
 export function getDatabaseUnavailableMessage(error?: unknown): string {
-  const message = error && typeof error === "object" && "message" in error ? String(error.message) : ""
+  const message = getErrorMessage(error)
+  const name = getErrorName(error)
   if (isVercelRuntime()) {
     if (message.includes("MONGODB_URI is not set")) {
       return "MONGODB_URI is missing on this Vercel deployment. Add it under Settings → Environment Variables for Production and Preview, then Redeploy."
+    }
+    if (name === "MongoParseError" || /invalid scheme|connection string/i.test(message)) {
+      return "The MongoDB connection string on Vercel is invalid. Paste the Atlas URI into MONGODB_URI without quotes or extra spaces, then Redeploy."
+    }
+    if (/authentication failed/i.test(message)) {
+      return "MongoDB rejected the Vercel login. Update MONGODB_URI with the correct Atlas username and password, then Redeploy."
     }
     return "Vercel cannot reach MongoDB Atlas. Confirm MONGODB_URI is set for Preview and Production, Redeploy, and in Atlas → Network Access allow 0.0.0.0/0."
   }

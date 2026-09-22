@@ -4,6 +4,8 @@ import { readMongoUri } from "@/lib/mongo-uri"
 import {
   getDatabaseUnavailableMessage,
   isDatabaseUnavailable,
+  isDuplicateKeyError,
+  isMongooseValidationError,
 } from "@/lib/mongodb"
 
 describe("mongo uri reader", () => {
@@ -31,9 +33,16 @@ describe("database unavailable helpers", () => {
 
   it("detects Atlas and missing-URI failures", () => {
     expect(isDatabaseUnavailable({ name: "MongooseServerSelectionError", message: "failed" })).toBe(true)
+    expect(isDatabaseUnavailable({ name: "MongoParseError", message: "Invalid scheme" })).toBe(true)
+    expect(isDatabaseUnavailable({ name: "MongoNetworkTimeoutError", message: "timed out" })).toBe(true)
     expect(isDatabaseUnavailable(new Error("MONGODB_URI is not set. Add it to .env.local"))).toBe(true)
     expect(isDatabaseUnavailable(new Error("querySrv ENOTFOUND"))).toBe(true)
+    expect(isDatabaseUnavailable(new Error("queryTxt EAI_AGAIN"))).toBe(true)
     expect(isDatabaseUnavailable(new Error("bad input"))).toBe(false)
+    expect(isDatabaseUnavailable({ name: "ValidationError", message: "User validation failed" })).toBe(false)
+    expect(isDuplicateKeyError({ code: 11000 })).toBe(true)
+    expect(isDuplicateKeyError({ code: "11000" })).toBe(true)
+    expect(isMongooseValidationError({ name: "ValidationError" })).toBe(true)
   })
 
   it("explains Vercel Atlas setup instead of local MongoDB", () => {
@@ -42,6 +51,9 @@ describe("database unavailable helpers", () => {
     expect(
       getDatabaseUnavailableMessage(new Error("MONGODB_URI is not set. In Vercel"))
     ).toMatch(/missing/)
+    expect(
+      getDatabaseUnavailableMessage({ name: "MongoParseError", message: "Invalid scheme, expected connection string to start with \"mongodb://\"" })
+    ).toMatch(/connection string/)
     delete process.env.VERCEL
     expect(getDatabaseUnavailableMessage()).toMatch(/\.env\.local/)
   })
