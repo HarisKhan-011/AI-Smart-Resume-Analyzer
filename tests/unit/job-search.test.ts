@@ -229,9 +229,10 @@ describe("job listing normalization", () => {
 })
 
 describe("job access", () => {
-  it("allows owners, public API jobs, and active recruiter postings", () => {
+  it("allows owners and active recruiter postings, not imported job-board listings", () => {
     expect(canAccessJob({ createdBy: user.id, source: "manual" }, user.id)).toBe(true)
-    expect(canAccessJob({ createdBy: null, source: "api" }, user.id)).toBe(true)
+    expect(canAccessJob({ createdBy: null, source: "api" }, user.id)).toBe(false)
+    expect(canAccessJob({ createdBy: null, source: "scrape" }, user.id)).toBe(false)
     expect(canAccessJob({ createdBy: "someone-else", source: "manual" }, user.id)).toBe(false)
     expect(
       canAccessJob(

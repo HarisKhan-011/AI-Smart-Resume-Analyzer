@@ -5,6 +5,10 @@ import { Job } from "@/models/job"
 import { listResumesByUser, type ResumeSummary } from "@/services/resume-service"
 import { listMatchesByUser } from "@/services/match-service"
 import { emptyApplicationCounts } from "@/services/applications/status"
+import {
+  buildIndustryInsights,
+  toIndustryInsightsSummary,
+} from "@/services/industry-insights/industry-insights-service"
 import type { CareerIntelligenceSnapshot, CareerMatchSummary } from "@/types/career-intelligence"
 
 type JobLabel = {
@@ -126,5 +130,15 @@ export async function loadCareerIntelligence(
     applicationTotal: 0,
     recommendedJobs: [],
     persistedMatches,
+    industryInsights: toIndustryInsightsSummary(
+      primary
+        ? buildIndustryInsights({
+            resumeId: primary.id,
+            resumeFileName: primary.fileName,
+            skills: primary.skills ?? [],
+            roleHints: (primary.experience ?? []).map((item) => item.position),
+          })
+        : null
+    ),
   }
 }

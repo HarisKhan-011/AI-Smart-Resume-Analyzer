@@ -19,6 +19,7 @@ describe("route protection helpers", () => {
     expect(isProtectedPath("/resume-improve")).toBe(true)
     expect(isProtectedPath("/interview-prep")).toBe(true)
     expect(isProtectedPath("/career-roadmap")).toBe(true)
+    expect(isProtectedPath("/industry-insights")).toBe(true)
     expect(isProtectedPath("/resume/upload")).toBe(true)
     expect(isProtectedPath("/recruiter/jobs")).toBe(true)
     expect(isProtectedPath("/admin")).toBe(true)

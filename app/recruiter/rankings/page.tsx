@@ -48,7 +48,7 @@ export default async function RecruiterRankingsPage({ searchParams }: RankingsPa
                 id="ranking-job"
                 name="jobId"
                 defaultValue={selectedId}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
               >
                 {jobs.map((job) => (
                   <option key={job.id} value={job.id}>

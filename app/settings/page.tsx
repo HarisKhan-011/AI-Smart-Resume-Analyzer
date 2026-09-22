@@ -55,7 +55,7 @@ export default function SettingsPage() {
               readOnly
             />
           </div>
-          <div className="space-y-3 border-t pt-5">
+          <div className="space-y-3 rounded-2xl border border-destructive/20 bg-destructive/5 p-4">
             <p className="text-sm font-medium text-destructive">Delete profile</p>
             <p className="text-sm text-muted-foreground">
               This permanently deletes your account, uploaded resumes, matches, and chat history. This cannot be undone.

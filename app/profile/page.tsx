@@ -162,14 +162,14 @@ export default function ProfilePage() {
                   <AlertDescription>{success}</AlertDescription>
                 </Alert>
               )}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 rounded-2xl border bg-muted/40 p-4">
                 <Avatar
                   src={image ?? undefined}
                   alt={name}
                   fallback={getInitials(name)}
                   className="h-16 w-16"
                 />
-                <div className="space-y-2">
+                <div className="min-w-0 flex-1 space-y-2">
                   <Label htmlFor="photo">Profile photo</Label>
                   <Input
                     id="photo"

@@ -37,10 +37,10 @@ export function ResumeCard({
   const statusInfo = statusConfig[analysisStatus]
 
   return (
-    <Card className="transition-shadow hover:shadow-md">
+    <Card className="transition-shadow hover:shadow-lift">
       <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
             <FileText className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
           <div className="min-w-0">

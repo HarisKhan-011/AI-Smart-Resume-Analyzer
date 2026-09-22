@@ -1,5 +1,6 @@
 import Link from "next/link"
 import {
+  Compass,
   Eye,
   FileText,
   GraduationCap,
@@ -33,6 +34,7 @@ const QUICK_ACTIONS = [
   { href: "/resume", label: "Check ATS", description: "Open your resume ATS report", icon: FileText },
   { href: "/job-match", label: "Job Match", description: "Compare a resume with a target role", icon: Search },
   { href: "/skill-gap", label: "Skill Gap", description: "See missing skills for a role", icon: TrendingUp },
+  { href: "/industry-insights", label: "Industry Insights", description: "Map your skills to a target industry", icon: Compass },
   { href: "/resume-improve", label: "Improve Resume", description: "Rewrite sections without inventing facts", icon: Wand2 },
   { href: "/career-assistant", label: "Career Assistant", description: "Ask grounded career questions", icon: MessageCircle },
   { href: "/interview-prep", label: "Interview Prep", description: "Practice questions from your resume", icon: GraduationCap },
@@ -83,6 +85,7 @@ export function CareerIntelligenceDashboard({ data }: { data: CareerIntelligence
     missingSkills,
     persistedMatches,
     resumeCount,
+    industryInsights,
   } = data
 
   const atsHref = primaryResume ? `/resume/${primaryResume.id}` : "/resume/upload"
@@ -129,7 +132,7 @@ export function CareerIntelligenceDashboard({ data }: { data: CareerIntelligence
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Quick actions</CardTitle>
+          <CardTitle className="text-lg tracking-tight">Quick actions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -140,17 +143,53 @@ export function CareerIntelligenceDashboard({ data }: { data: CareerIntelligence
                 <Link
                   key={action.label}
                   href={href}
-                  className="flex items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                  className="group flex items-start gap-3 rounded-2xl border bg-background p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-lift"
                 >
-                  <Icon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
                   <span>
-                    <span className="block text-sm font-medium">{action.label}</span>
-                    <span className="mt-1 block text-xs text-muted-foreground">{action.description}</span>
+                    <span className="block text-sm font-semibold tracking-tight">{action.label}</span>
+                    <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{action.description}</span>
                   </span>
                 </Link>
               )
             })}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">Industry insights</CardTitle>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/industry-insights">Open insights</Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {!industryInsights ? (
+            <EmptyState
+              icon={Compass}
+              title="No industry signal yet"
+              description="Analyze a resume with extracted skills to see industry fit, outlook, and in-demand skills."
+              actionText="Upload Resume"
+              actionHref="/resume/upload"
+            />
+          ) : (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline">{industryInsights.industryName}</Badge>
+                <Badge variant={industryInsights.outlook === "Growing" ? "success" : "secondary"}>
+                  {industryInsights.outlook}
+                </Badge>
+                <Badge variant="secondary">{industryInsights.fitScore}% skill fit</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {industryInsights.matchedCount} of {industryInsights.inDemandCount} in-demand skills for this
+                industry are already on your resume.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

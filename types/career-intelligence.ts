@@ -46,4 +46,11 @@ export type CareerIntelligenceSnapshot = {
   applicationTotal: number
   recommendedJobs: JobRecommendation[]
   persistedMatches: CareerMatchSummary[]
+  industryInsights: {
+    industryName: string
+    fitScore: number
+    outlook: string
+    matchedCount: number
+    inDemandCount: number
+  } | null
 }

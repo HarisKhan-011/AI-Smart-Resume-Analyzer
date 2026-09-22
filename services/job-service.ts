@@ -82,8 +82,8 @@ export function canAccessJob(
   job: Pick<JobDTO, "createdBy" | "source" | "isPosted" | "isActive">,
   userId: string
 ): boolean {
+  if (job.source === "api" || job.source === "scrape") return false
   if (job.createdBy === userId) return true
-  if (job.source === "api") return true
   return Boolean(job.isPosted) && job.isActive !== false
 }
 
@@ -96,9 +96,9 @@ export async function getAccessibleJob(id: string, userId: string): Promise<JobD
 export async function listAccessibleJobs(userId: string): Promise<JobDTO[]> {
   await dbConnect()
   const jobs = await Job.find({
+    source: { $nin: ["api", "scrape"] },
     $or: [
       { createdBy: userId },
-      { source: "api" },
       { isPosted: true, isActive: { $ne: false } },
     ],
   })
@@ -113,9 +113,9 @@ export async function listJobsForRecommendations(
 ): Promise<JobDTO[]> {
   await dbConnect()
   const jobs = await Job.find({
+    source: { $nin: ["api", "scrape"] },
     $or: [
       { createdBy: userId },
-      { source: "api" },
       { isPosted: true, isActive: { $ne: false } },
     ],
     requiredSkills: { $exists: true, $ne: [] },
@@ -125,19 +125,17 @@ export async function listJobsForRecommendations(
   return jobs.map(toJobDTO).filter((job) => isPakistanJob(job.location))
 }
 
-export async function listPublicJobs(options?: {
+export async function listPublicJobs(_options?: {
   limit?: number
   employmentType?: string
 }): Promise<JobDTO[]> {
+  return []
+}
+
+export async function deleteImportedJobListings(): Promise<number> {
   await dbConnect()
-  const query: Record<string, unknown> = { source: "api" }
-  if (options?.employmentType && options.employmentType !== "all") {
-    query.employmentType = options.employmentType
-  }
-  const jobs = await Job.find(query)
-    .sort({ postedDate: -1 })
-    .limit(options?.limit ?? 20)
-  return jobs.map(toJobDTO)
+  const result = await Job.deleteMany({ source: { $in: ["api", "scrape"] } })
+  return result.deletedCount ?? 0
 }
 
 export async function upsertJobBySource(input: CreateJobInput): Promise<JobDTO> {

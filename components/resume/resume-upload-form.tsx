@@ -131,11 +131,11 @@ export function ResumeUploadForm() {
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
         className={cn(
-          "flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-12 text-center transition-colors",
+          "flex flex-col items-center justify-center rounded-3xl border-2 border-dashed px-6 py-14 text-center transition-colors",
           isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25 bg-muted/20"
         )}
       >
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
           <Upload className="h-7 w-7 text-primary" aria-hidden="true" />
         </div>
         <p className="text-base font-medium">Drop your resume here</p>

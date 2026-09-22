@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { getPostLoginPath } from "@/lib/auth-paths"
 import { Menu, X } from "lucide-react"
+import { BrandMark } from "@/components/brand/brand-mark"
 import { cn } from "@/lib/utils"
 
 const SECTION_LINKS = [
@@ -21,8 +22,8 @@ const SECTION_IDS = ["home", ...SECTION_LINKS.map((item) => item.id)] as const
 
 function navClass(active: boolean) {
   return cn(
-    "text-sm font-medium transition-colors hover:text-primary",
-    active ? "text-primary" : "text-muted-foreground"
+    "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+    active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground"
   )
 }
 
@@ -33,12 +34,22 @@ function sectionFromHash(hash: string): string {
 
 export function LandingNavbar({ compact = false }: { compact?: boolean }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState<string>("home")
   const lockedSection = useRef<string | null>(null)
   const pathname = usePathname()
   const { data: session, status } = useSession()
   const dashboardHref = getPostLoginPath(session?.user?.role)
   const onHome = pathname === "/"
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 12)
+    }
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   useEffect(() => {
     if (!onHome) {
@@ -92,21 +103,27 @@ export function LandingNavbar({ compact = false }: { compact?: boolean }) {
   const homeActive = onHome && activeSection === "home"
 
   return (
-    <header className="sticky top-0 z-50 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className={cn("container mx-auto flex items-center justify-between px-4", compact ? "h-14" : "h-16")}>
+    <header
+      className={cn(
+        "sticky top-0 z-50 shrink-0 border-b backdrop-blur-xl transition-all duration-300",
+        compact
+          ? "border-border/70 bg-background/90"
+          : scrolled
+            ? "border-border/80 bg-background/90 shadow-sm"
+            : "border-transparent bg-background/70"
+      )}
+    >
+      <div className={cn("container mx-auto flex items-center justify-between px-4", compact ? "h-14" : "h-[4.25rem]")}>
         <Link
           href="/#home"
-          className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onClick={() => activateSection("home")}
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">R</span>
-          </div>
-          <span className="text-lg font-semibold">ResumeAI</span>
+          <BrandMark compact={compact} />
         </Link>
 
         {!compact && (
-          <nav className="hidden items-center gap-6 md:flex" aria-label="Main navigation">
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
             <Link href="/#home" className={navClass(homeActive)} onClick={() => activateSection("home")}>
               Home
             </Link>
@@ -125,7 +142,7 @@ export function LandingNavbar({ compact = false }: { compact?: boolean }) {
 
         <div className="hidden items-center gap-3 md:flex">
           {status === "loading" ? (
-            <div className="h-9 w-28 animate-pulse rounded-md bg-muted" aria-hidden="true" />
+            <div className="h-9 w-28 animate-pulse rounded-full bg-muted" aria-hidden="true" />
           ) : session?.user ? (
             <>
               <Button variant="ghost" asChild>
@@ -146,7 +163,7 @@ export function LandingNavbar({ compact = false }: { compact?: boolean }) {
         </div>
 
         <button
-          className="rounded-md p-2 text-muted-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
+          className="rounded-full p-2 text-muted-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
@@ -162,7 +179,7 @@ export function LandingNavbar({ compact = false }: { compact?: boolean }) {
               <>
                 <Link
                   href="/#home"
-                  className={cn("rounded-md px-3 py-2 text-sm font-medium hover:bg-accent", homeActive && "text-primary")}
+                  className={cn("rounded-xl px-3 py-2 text-sm font-medium hover:bg-accent", homeActive && "bg-primary/10 text-primary")}
                   onClick={() => activateSection("home")}
                 >
                   Home
@@ -172,8 +189,8 @@ export function LandingNavbar({ compact = false }: { compact?: boolean }) {
                     key={link.id}
                     href={link.href}
                     className={cn(
-                      "rounded-md px-3 py-2 text-sm font-medium hover:bg-accent",
-                      onHome && activeSection === link.id ? "text-primary" : "text-muted-foreground"
+                      "rounded-xl px-3 py-2 text-sm font-medium hover:bg-accent",
+                      onHome && activeSection === link.id ? "bg-primary/10 text-primary" : "text-muted-foreground"
                     )}
                     onClick={() => activateSection(link.id)}
                   >

@@ -131,6 +131,10 @@ function applicationAdvice(context: CareerChatContext): string {
   return lines.join("\n\n")
 }
 
+function industryAdvice(): string {
+  return "Open Industry Insights to see how skills already on your resume map to a target industry. Outlook and salary bands there are a curated baseline, not live job-board data."
+}
+
 function overviewAdvice(context: CareerChatContext): string {
   const parts = [atsAdvice(context), skillAdvice(context), matchAdvice(context), applicationAdvice(context)]
   return `Here is what I can say from your ResumeAI data only:\n\n${parts.join("\n\n")}`
@@ -150,6 +154,8 @@ export function adviseFromCareerContext(context: CareerChatContext, question: st
 
   if (/ats|parser|readable|resume score/.test(text)) {
     answer = atsAdvice(context)
+  } else if (/industry|outlook|salary|market/.test(text)) {
+    answer = industryAdvice()
   } else if (/application|applied|interview|offer|saved job/.test(text)) {
     answer = applicationAdvice(context)
   } else if (/skill|learn|gap/.test(text)) {

@@ -16,8 +16,8 @@ type CareerChatProps = {
 const SUGGESTIONS = [
   "How ATS-friendly is my current resume?",
   "Which skills should I learn next?",
+  "What industry do my skills fit?",
   "How do my job matches look?",
-  "What should I improve first?",
 ]
 
 function toSafeDate(value: Date | string | number | null | undefined): Date {
@@ -174,10 +174,10 @@ export function CareerChat({ initialMessages }: CareerChatProps) {
           </Alert>
         )}
 
-        <div className="flex min-h-[22rem] flex-1 flex-col overflow-y-auto rounded-lg border bg-muted/20 p-4">
+        <div className="flex min-h-[22rem] flex-1 flex-col overflow-y-auto rounded-2xl border bg-muted/30 p-4">
           {messages.length === 0 && !isSending ? (
             <div className="m-auto max-w-lg space-y-4 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
                 <MessageCircle className="h-6 w-6 text-primary" aria-hidden="true" />
               </div>
               <div>
@@ -222,39 +222,44 @@ export function CareerChat({ initialMessages }: CareerChatProps) {
         {followUps.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {followUps.map((suggestion) => (
-              <Button
+              <button
                 key={suggestion}
                 type="button"
-                variant="outline"
-                size="sm"
-                className="h-auto whitespace-normal text-left"
                 disabled={isSending}
                 onClick={() => void sendMessage(suggestion)}
+                className="rounded-full border bg-background px-3 py-1.5 text-left text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-accent hover:text-foreground disabled:opacity-50"
               >
                 {suggestion}
-              </Button>
+              </button>
             ))}
           </div>
         )}
 
-        <form onSubmit={onSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-end">
+        <form onSubmit={onSubmit} className="flex items-end gap-2 rounded-2xl border bg-background p-1.5 pl-3 shadow-sm">
           <Textarea
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Ask a follow-up about your resume, ATS score, matches, or skill gaps..."
-            className="min-h-[88px] resize-none"
+            placeholder="Ask about your resume, ATS score, or skill gaps"
+            rows={1}
+            className="min-h-10 max-h-24 flex-1 resize-none border-0 bg-transparent px-0 py-2 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
             maxLength={2000}
             disabled={isSending}
             aria-label="Career assistant message"
           />
-          <Button type="submit" disabled={isSending || !draft.trim()} className="sm:h-[88px] sm:px-6">
+          <Button
+            type="submit"
+            size="icon"
+            className="h-9 w-9 shrink-0"
+            disabled={isSending || !draft.trim()}
+            aria-label="Send message"
+            title="Send"
+          >
             {isSending ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
             ) : (
               <Send className="h-4 w-4" aria-hidden="true" />
             )}
-            Send
           </Button>
         </form>
       </CardContent>

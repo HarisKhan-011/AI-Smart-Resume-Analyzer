@@ -14,7 +14,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     <div
       ref={ref}
       className={cn(
-        "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted",
+        "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full bg-primary/10",
         className
       )}
       {...props}
@@ -23,7 +23,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt ?? "Avatar"} className="aspect-square h-full w-full object-cover" />
       ) : (
-        <span className="flex h-full w-full items-center justify-center text-sm font-medium text-muted-foreground">
+        <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-primary">
           {fallback ?? "?"}
         </span>
       )}

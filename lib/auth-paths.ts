@@ -14,6 +14,7 @@ export const PROTECTED_PREFIXES = [
   "/resume-improve",
   "/interview-prep",
   "/career-roadmap",
+  "/industry-insights",
   "/profile",
   "/settings",
   "/recruiter",

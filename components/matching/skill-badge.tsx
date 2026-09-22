@@ -26,26 +26,26 @@ export function SkillBadge({ skill, status = "normal", size = "md" }: SkillBadge
     matched: {
       variant: "success" as const,
       icon: <Check className="h-3 w-3" />,
-      label: "Matched"
+      className: "",
     },
     missing: {
       variant: "destructive" as const,
       icon: <X className="h-3 w-3" />,
-      label: "Missing"
+      className: "border-transparent bg-rose-50 text-rose-700 hover:bg-rose-100",
     },
     preferred: {
       variant: "warning" as const,
       icon: <AlertCircle className="h-3 w-3" />,
-      label: "Preferred"
-    }
+      className: "",
+    },
   }
 
   const config = statusConfig[status]
 
   return (
-    <Badge 
-      variant={config.variant} 
-      className={cn("flex items-center gap-1", sizeClasses[size])}
+    <Badge
+      variant={config.variant}
+      className={cn("flex items-center gap-1", sizeClasses[size], config.className)}
     >
       {config.icon}
       {skill}

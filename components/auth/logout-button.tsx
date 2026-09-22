@@ -25,8 +25,8 @@ export function LogoutButton({ collapsed = false, className, onClick }: LogoutBu
       type="button"
       onClick={handleLogout}
       className={cn(
-        "flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        collapsed ? "justify-center" : "space-x-3",
+        "flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        collapsed ? "justify-center" : "gap-3",
         className
       )}
       title={collapsed ? "Logout" : undefined}

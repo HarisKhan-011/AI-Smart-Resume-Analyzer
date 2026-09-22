@@ -16,14 +16,14 @@ export function MobileNavigation({ open, onClose, role = "candidate" }: MobileNa
     <>
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm md:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-200 ease-in-out lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-200 ease-in-out md:hidden",
           open ? "translate-x-0" : "-translate-x-full"
         )}
         role="dialog"
@@ -33,7 +33,7 @@ export function MobileNavigation({ open, onClose, role = "candidate" }: MobileNa
         <div className="relative h-full">
           <button
             onClick={onClose}
-            className="absolute right-3 top-4 z-10 rounded-md p-1 text-muted-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="absolute right-3 top-4 z-10 rounded-full p-1.5 text-muted-foreground hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Close navigation menu"
           >
             <X className="h-5 w-5" />
@@ -49,7 +49,7 @@ export function MobileMenuButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="rounded-md p-2 text-muted-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
+      className="rounded-full p-2 text-muted-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
       aria-label="Open navigation menu"
     >
       <Menu className="h-5 w-5" />

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { BrandMark } from "@/components/brand/brand-mark"
 
 const productLinks = [
   { href: "/#features", label: "Features" },
@@ -17,7 +18,7 @@ const accountLinks = [
 export function LandingFooter({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
-      <footer className="shrink-0 border-t bg-background">
+      <footer className="shrink-0 border-t bg-background/90">
         <div className="container mx-auto flex h-12 items-center justify-between px-4 text-xs text-muted-foreground">
           <span>© {new Date().getFullYear()} ResumeAI</span>
           <span>Smart resume analysis</span>
@@ -28,15 +29,10 @@ export function LandingFooter({ compact = false }: { compact?: boolean }) {
 
   return (
     <footer className="border-t bg-background">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-2">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <span className="text-sm font-bold text-primary-foreground">R</span>
-              </div>
-              <span className="text-lg font-semibold tracking-tight">ResumeAI</span>
-            </div>
+            <BrandMark />
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
               A focused resume analyzer and job matcher. Upload a CV, score ATS readiness,
               and compare it with a target role description.

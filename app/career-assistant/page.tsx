@@ -12,7 +12,7 @@ export default async function CareerAssistantPage() {
     <div className="space-y-6">
       <PageHeader
         title="Career Assistant"
-        description="Personalized advice from your actual resume, ATS results, job matches, and skill gaps."
+        description="Personalized advice from your actual resume, ATS results, job matches, skill gaps, and industry insights."
         icon={MessageCircle}
       />
       <CareerChat

@@ -1,0 +1,70 @@
+{
+  "disclaimer": "Curated baseline for ResumeAI. Not live job-board or salary-API data.",
+  "industries": [
+    {
+      "id": "software-engineering",
+      "name": "Software Engineering",
+      "summary": "Product engineering roles that ship web and backend systems.",
+      "outlook": "Growing",
+      "outlookNote": "Demand stays strongest for engineers who can ship full features, not only isolated tickets.",
+      "salaryRange": "$70k–$140k",
+      "hiringFocus": "Production experience, TypeScript/JavaScript depth, and clear system-design examples.",
+      "roleHints": ["software", "frontend", "backend", "full stack", "fullstack", "web developer", "engineer"],
+      "typicalRoles": ["Frontend Developer", "Backend Developer", "Full-Stack Engineer", "Software Engineer"],
+      "inDemandSkills": ["JavaScript", "TypeScript", "React", "Node.js", "Next.js", "SQL", "Git", "REST"],
+      "nextSkills": ["TypeScript", "Next.js", "GraphQL", "PostgreSQL"]
+    },
+    {
+      "id": "data-ai",
+      "name": "Data & AI",
+      "summary": "Analytics, machine learning, and applied AI roles.",
+      "outlook": "Growing",
+      "outlookNote": "Hiring favors people who can clean data, train models, and explain results to non-technical teams.",
+      "salaryRange": "$80k–$160k",
+      "hiringFocus": "Python plus a proven ML or analytics project with measurable outcomes.",
+      "roleHints": ["data", "machine learning", "ml", "ai", "analyst", "scientist"],
+      "typicalRoles": ["Data Analyst", "Machine Learning Engineer", "Data Scientist", "AI Engineer"],
+      "inDemandSkills": ["Python", "SQL", "Machine Learning", "Pandas", "NumPy", "TensorFlow", "PyTorch", "scikit-learn"],
+      "nextSkills": ["Deep Learning", "NLP", "TensorFlow", "PyTorch"]
+    },
+    {
+      "id": "cloud-devops",
+      "name": "Cloud & DevOps",
+      "summary": "Infrastructure, cloud platforms, and delivery automation.",
+      "outlook": "Growing",
+      "outlookNote": "Teams want engineers who can deploy reliably, not only write application code.",
+      "salaryRange": "$85k–$155k",
+      "hiringFocus": "Docker/Kubernetes plus one major cloud and a CI/CD pipeline you can describe end to end.",
+      "roleHints": ["devops", "sre", "cloud", "platform", "infrastructure"],
+      "typicalRoles": ["DevOps Engineer", "Cloud Engineer", "SRE", "Platform Engineer"],
+      "inDemandSkills": ["Docker", "Kubernetes", "CI/CD", "AWS", "Linux", "Terraform", "GitHub Actions", "Nginx"],
+      "nextSkills": ["Kubernetes", "Terraform", "AWS", "CI/CD"]
+    },
+    {
+      "id": "mobile",
+      "name": "Mobile Engineering",
+      "summary": "Native and cross-platform mobile product work.",
+      "outlook": "Stable",
+      "outlookNote": "Openings concentrate on shipped App Store / Play Store experience.",
+      "salaryRange": "$75k–$145k",
+      "hiringFocus": "A public app, platform expertise (Swift or Kotlin), and API integration.",
+      "roleHints": ["mobile", "android", "ios", "react native"],
+      "typicalRoles": ["Android Developer", "iOS Developer", "Mobile Engineer"],
+      "inDemandSkills": ["Kotlin", "Swift", "Firebase", "REST", "Git", "Problem Solving"],
+      "nextSkills": ["Kotlin", "Swift", "Firebase", "REST"]
+    },
+    {
+      "id": "product-design",
+      "name": "Product & Design",
+      "summary": "Product thinking, UX, and interface craft.",
+      "outlook": "Stable",
+      "outlookNote": "Roles reward portfolios that show research, iteration, and shipped UI.",
+      "salaryRange": "$65k–$130k",
+      "hiringFocus": "Figma work plus evidence you collaborated with engineers and users.",
+      "roleHints": ["product", "design", "ux", "ui", "designer"],
+      "typicalRoles": ["Product Designer", "UX Designer", "UI Designer", "Product Manager"],
+      "inDemandSkills": ["Figma", "Communication", "Problem Solving", "Leadership", "Jira"],
+      "nextSkills": ["Figma", "Communication", "Leadership"]
+    }
+  ]
+}

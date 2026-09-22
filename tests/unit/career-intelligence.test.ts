@@ -67,6 +67,7 @@ describe("career intelligence dashboard data", () => {
     expect(snapshot.currentSkills).toEqual(["JavaScript", "React"])
     expect(snapshot.recommendedJobs).toEqual([])
     expect(snapshot.persistedMatches[0]?.jobTitle).toBe("Frontend Developer")
+    expect(snapshot.industryInsights?.industryName).toBe("Software Engineering")
   })
 
   it("does not invent ATS or match scores when that data is missing", async () => {

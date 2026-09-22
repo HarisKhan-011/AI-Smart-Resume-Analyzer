@@ -33,7 +33,7 @@ type SkillGapResponse = {
 }
 
 const selectClassName =
-  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+  "flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 
 function SkillGroup({
   title,
@@ -252,7 +252,7 @@ export function SkillGapForm({
                 <ul className="space-y-3">
                   {result.recommendations.map((item) => (
                     <li key={`${item.required ? "required" : "preferred"}-${item.skill}`} className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                         <BookOpen className="h-4 w-4 text-primary" aria-hidden="true" />
                       </div>
                       <div>
