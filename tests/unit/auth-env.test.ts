@@ -21,6 +21,16 @@ describe("mongo uri reader", () => {
     )
     expect(readMongoUri({})).toBe("")
   })
+
+  it("ignores non-Mongo URLs and strips a pasted MONGODB_URI= prefix", () => {
+    expect(
+      readMongoUri({
+        DATABASE_URL: "postgres://user:pass@host:5432/app",
+        MONGODB_URI: "MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/app",
+      })
+    ).toBe("mongodb+srv://user:pass@cluster.mongodb.net/app")
+    expect(readMongoUri({ DATABASE_URL: "postgres://user:pass@host:5432/app" })).toBe("")
+  })
 })
 
 describe("database unavailable helpers", () => {
