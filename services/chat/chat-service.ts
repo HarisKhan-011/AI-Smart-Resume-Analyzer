@@ -175,7 +175,7 @@ export async function sendOwnedChatMessage(
     content = await deps.completeChat(llmMessages, getChatLlmConfig())
   } catch (error) {
     if (error instanceof ChatLlmError && error.code === "LLM_NOT_CONFIGURED") {
-      content = advise(context, message)
+      content = advise(context, message, conversation.messages)
     } else {
       throw error
     }

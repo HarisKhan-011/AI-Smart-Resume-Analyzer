@@ -15,8 +15,10 @@ type CareerChatProps = {
 
 const SUGGESTIONS = [
   "How ATS-friendly is my current resume?",
+  "How can I improve my resume?",
   "Which skills should I learn next?",
-  "What industry do my skills fit?",
+  "Help me prep for interviews",
+  "What should my career roadmap be?",
   "How do my job matches look?",
 ]
 
@@ -145,14 +147,15 @@ export function CareerChat({ initialMessages }: CareerChatProps) {
   }
 
   const asked = new Set(messages.filter((item) => item.role === "user").map((item) => item.content))
-  const followUps = SUGGESTIONS.filter((item) => !asked.has(item))
+  const unused = SUGGESTIONS.filter((item) => !asked.has(item))
+  const followUps = messages.length === 0 ? unused : unused.slice(0, 4)
 
   return (
     <Card className="flex min-h-[32rem] flex-col">
       <CardContent className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            Answers use only your resume, skills, ATS results, job matches, and skill gaps.
+            Type any question about your resume, skills, interviews, or roadmap. The chips below are only examples.
           </p>
           <Button
             type="button"
@@ -181,9 +184,9 @@ export function CareerChat({ initialMessages }: CareerChatProps) {
                 <MessageCircle className="h-6 w-6 text-primary" aria-hidden="true" />
               </div>
               <div>
-                <p className="font-medium">Ask about your career data</p>
+                <p className="font-medium">Ask in your own words</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  I will not invent jobs, scores, or skills that are not already in your account.
+                  Try “How can I improve that?” after an ATS answer, or ask about interviews and skills. I will not invent jobs, scores, or skills.
                 </p>
               </div>
             </div>
@@ -240,7 +243,7 @@ export function CareerChat({ initialMessages }: CareerChatProps) {
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Ask about your resume, ATS score, or skill gaps"
+            placeholder="Ask anything about your resume, interviews, skills, or roadmap"
             rows={1}
             className="min-h-10 max-h-24 flex-1 resize-none border-0 bg-transparent px-0 py-2 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
             maxLength={2000}

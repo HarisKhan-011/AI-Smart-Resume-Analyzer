@@ -82,4 +82,33 @@ describe("career chat local advisor", () => {
     expect(reply).toMatch(/can't answer any irrelevant questions/i)
     expect(reply).not.toContain("78/100")
   })
+
+  it("refuses chit-chat instead of dumping career data", () => {
+    const reply = adviseFromCareerContext(context, "lol", [
+      { role: "user", content: "How ATS-friendly is my current resume?", createdAt: new Date() },
+      { role: "assistant", content: "Your ATS-oriented score is 78/100.", createdAt: new Date() },
+    ])
+    expect(reply).toMatch(/can't answer any irrelevant questions/i)
+  })
+
+  it("answers typed improvement follow-ups from ATS issues, not a generic dump", () => {
+    const reply = adviseFromCareerContext(context, "how can we improve that", [
+      { role: "user", content: "How ATS-friendly is my current resume?", createdAt: new Date() },
+      { role: "assistant", content: "Your ATS-oriented score is 78/100.", createdAt: new Date() },
+    ])
+    expect(reply).toMatch(/improve/i)
+    expect(reply).toContain("Add measurable results to experience bullets.")
+    expect(reply).toContain("TypeScript")
+    expect(reply).not.toMatch(/can't answer any irrelevant questions/i)
+  })
+
+  it("answers interview and roadmap questions from stored data", () => {
+    const interview = adviseFromCareerContext(context, "Help me prep for interviews")
+    expect(interview).toContain("Frontend Developer at Acme Inc")
+    expect(interview).toContain("TypeScript")
+
+    const roadmap = adviseFromCareerContext(context, "What should my career roadmap be?")
+    expect(roadmap).toContain("Frontend Developer at Acme Inc")
+    expect(roadmap).toContain("Learn TypeScript fundamentals")
+  })
 })
