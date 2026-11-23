@@ -15,7 +15,6 @@ const SECTION_LINKS = [
   { id: "features", href: "/#features", label: "Features" },
   { id: "how-it-works", href: "/#how-it-works", label: "How It Works" },
   { id: "for-candidates", href: "/#for-candidates", label: "For Candidates" },
-  { id: "for-recruiters", href: "/#for-recruiters", label: "For Recruiters" },
 ] as const
 
 const SECTION_IDS = ["home", ...SECTION_LINKS.map((item) => item.id)] as const
@@ -105,7 +104,7 @@ export function LandingNavbar({ compact = false }: { compact?: boolean }) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 shrink-0 border-b backdrop-blur-xl transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 shrink-0 border-b backdrop-blur-xl transition-all duration-300",
         compact
           ? "border-border/70 bg-background/90"
           : scrolled
